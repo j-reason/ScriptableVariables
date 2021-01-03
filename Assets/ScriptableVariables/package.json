@@ -1,7 +1,7 @@
 {
   "name": "com.jreason.scriptablevariables",
   "version": "0.1.0",
-  "displayName": "Scriptable Variables",
+  "displayName": "Generic Scriptable Variables",
   "description": "Package which allows users to create Variables as assets in the inspector.",
   "unity": "2020.1",
   "dependencies": {},
