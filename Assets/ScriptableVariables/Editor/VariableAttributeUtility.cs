@@ -26,37 +26,42 @@ namespace Variables.Editor
             CachedAttributes = VariableMenuAttribute.GetAll();
         }
 
-        public static GenericMenu GetMenu(Action<Type> callback,Type currentType)
+        public static GenericMenu GetMenu(Action<Type> callback, Type currentType)
         {
-            GenericMenu menu = new GenericMenu();
-            VariableMenuAttribute lastAttribute = null;
+            
+            GenericMenu menu = new GenericMenu(); //return value
+            Dictionary<string, int> seperatorCheck = new Dictionary<string, int>(); //holds last entry to a sub menu
 
-            foreach(KeyValuePair<Type, VariableMenuAttribute> pair in CachedAttributes.OrderBy(p => p.Value, new VariableAttributeComparer()))
+            //Loop through all Variable Types
+            foreach (KeyValuePair<Type, VariableMenuAttribute> pair in CachedAttributes.OrderBy(p => p.Value, new VariableAttributeComparer()))
             {
-                UnityEngine.Debug.Log(pair.Value.menuName);
-                VariableMenuAttribute current = pair.Value;
-                if (lastAttribute == null)
-                    lastAttribute = current;
 
-                string path = pair.Value.menuName; //+ "/" + pair.Key.Name.Replace("Variable", "").Replace("variable", "");
-   
-                if (lastAttribute.GetSubMenuOnly().Equals(current.GetSubMenuOnly()))
-                {
-                    if (current.order - lastAttribute.order >= 10 || current.order < lastAttribute.order)
-                        menu.AddSeparator(current.GetSubMenuOnly());
-                }
-              
+                VariableMenuAttribute current = pair.Value;
+                string path = pair.Value.menuName;
+                string subMenu = pair.Value.GetSubMenuOnly();
+
+                //if first instance of submenu add
+                if (!seperatorCheck.ContainsKey(subMenu))
+                    seperatorCheck.Add(current.GetSubMenuOnly(), current.order);
+
+                //Check if there is a gap of 10 between this and the last attribute, if so add a seperator
+                if (current.order - seperatorCheck[subMenu] >= 10)
+                    menu.AddSeparator(subMenu);
+                seperatorCheck[subMenu] = current.order;
+
+                //Add item to menu, highlight if it is the current type
                 menu.AddItem(new UnityEngine.GUIContent(path), currentType?.Equals(pair.Key) ?? false, (p => callback((Type)p)), pair.Key);
-                lastAttribute = current;
+
             }
+
+            //Add seperator and create new button at end
+            menu.AddSeparator("");
+            menu.AddItem(new UnityEngine.GUIContent("Create New"), false, VariableCreator.Open);
 
             return menu;
         }
 
 
-
-
- 
     }
 
     public class VariableAttributeComparer : IComparer<VariableMenuAttribute>

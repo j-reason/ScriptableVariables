@@ -18,14 +18,14 @@ namespace Variables.Editor
         private VariableMenuAttribute attribute = new VariableMenuAttribute();
 
         private bool m_showAdvanced;
-        private string m_namespace;
+        private string m_namespace = "Variables.Types";
         private string AssetPath = "";
         private GUIStyle richLabel;
         private GUIStyle postFoldout;
 
         // Add menu named "My Window" to the Window menu
         [MenuItem("Tools/Create Variable")]
-        static void Init()
+        public static void Open()
         {
             // Get existing open window or if none, make a new one:
             VariableCreator window = (VariableCreator)EditorWindow.GetWindow<VariableCreator>(true, "Create new Variable", true);
@@ -121,6 +121,10 @@ namespace Variables.Editor
                 EditorPrefs.SetString("VariableAssetPath", AssetPath);
             }
             GUILayout.EndHorizontal();
+
+            EditorGUILayout.LabelField("Namespace", richLabel);
+            m_namespace = EditorGUILayout.TextField(m_namespace);
+
 
 
             GUI.enabled = true;
