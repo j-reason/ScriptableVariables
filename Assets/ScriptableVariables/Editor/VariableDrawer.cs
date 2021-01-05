@@ -1,116 +1,141 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
-using System;
-using System.Linq;
-using System.Collections;
-using System.Reflection;
-using Inspector = UnityEditor.Editor;
 
 
 namespace Variables.Editor
 {
+
     /// <summary>
-    /// Custom Inspector for Variable Assets
+    /// Custom Property Drawer for Variables
     /// </summary>
-    [CustomEditor(typeof(Variable<>), true)]
-    public class VariableDrawer : Inspector
+    [CustomPropertyDrawer(typeof(Variable<>), true)]
+    public class VariableDrawer : PropertyDrawer
     {
-        //Key for dialogue box
-        const string ChangeTypeDialogueDecisionKey = "ScriptableVariables.ChangeTypeDialogue";
 
         #region Private Variables
-        //References to serialized propertyes
-        private SerializedProperty m_currentValue;
-        private SerializedProperty m_defaultValue;
 
-        //Name of Variable Type
+        //Readable name of the type
         private string m_TypeName;
-        #endregion
+
+        #endregion Private Variables
 
         #region Unity Functions
-        public void OnEnable()
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            //set up values
-            m_currentValue = serializedObject.FindProperty("m_currentValue");
-            m_defaultValue = serializedObject.FindProperty("defaultValue");
-            m_TypeName = VariableMenuUtility.CachedAttributes[target.GetType()].GetNameOnly();
-        }
+            //Make sure all values are setup
+            CacheValues();
 
-        public override void OnInspectorGUI()
-        {
-            //show TypeGUI
-            TypeGUI();
+            //draw label and get rect pos without label
+            label = EditorGUI.BeginProperty(position, label, property);
+            position = EditorGUI.PrefixLabel(position, label);
 
-            //Show default value when not in play, else show currnet value
-            SerializedProperty _property = (EditorApplication.isPlaying) ? m_currentValue : m_defaultValue;
+            //Start the property
+            EditorGUI.BeginChangeCheck();
 
-            if (_property != null)
+            //If the object reference is null
+            if (property.objectReferenceValue == null)
             {
-                _property.isExpanded = true; //force property to be expanded (e.g. Quaternions)
-
-                //display and apply property
-                EditorGUILayout.PropertyField(_property, new GUIContent(_property.propertyType.ToString()), true);
-                serializedObject.ApplyModifiedProperties();
+                //Draw a clear Object field and then draw the type on after
+                DrawClearObjectField(position, property, GUIContent.none);
+                GUI.Label(position, $"None ({m_TypeName})");
             }
+
+            //Else just draw the property field normally
+            else
+                EditorGUI.PropertyField(position, property, GUIContent.none);
+
+            //if there has been a changes to the property apply them
+            if (EditorGUI.EndChangeCheck())
+                property.serializedObject.ApplyModifiedProperties();
+            EditorGUI.EndProperty();
+
+            //Deal with object draggin
+            DragGUI(position);
         }
-        #endregion
+        #endregion Unity Functions
 
         #region GUI Functions
         /// <summary>
-        /// GUI for creating a dropdown to Change the Variable Type
+        /// Generic Properties try and accept any object from the same generic parent being dragged in
+        /// This function fixes the visuals of the Drag and Drop
         /// </summary>
-        private void TypeGUI()
+        /// <param name="position">position of the property</param>
+        private void DragGUI(Rect position)
         {
+            //Check if mouse is hovering over the property and that it is dragging something
+            Event e = Event.current;
+            if (!position.Contains(e.mousePosition) || ((DragAndDrop.objectReferences?.Length ?? 0) == 0))
+                return;
 
-            GUILayout.BeginHorizontal(); //Draw all on one line
-            EditorGUILayout.PrefixLabel("Type"); //Label
+            //if multiple things are being dragged show that they can't be accepted in the one property
+            if (DragAndDrop.objectReferences.Length != 1)
+                DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
 
-            //Create a button but in the style of a dropdown
-            Rect buttonPos = GUILayoutUtility.GetRect(new GUIContent(m_TypeName), EditorStyles.popup);
-            if (GUI.Button(buttonPos, m_TypeName, EditorStyles.popup))
-            {
-                //when clicked display dropdown
-                GenericMenu typeMenu = VariableMenuUtility.GetMenu(ChangeType, target.GetType());
-                typeMenu.DropDown(buttonPos);
-            }
-
-            //End horizontal + draw line underneath
-            GUILayout.EndHorizontal();//E
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            //if the dragged object isn't the correct type show the reject icon
+            Object draggedObject = DragAndDrop.objectReferences[0];
+            if (!fieldInfo.FieldType.IsAssignableFrom(draggedObject.GetType()))
+                DragAndDrop.visualMode = DragAndDropVisualMode.Rejected;
         }
-        #endregion GUI Functions
+        #endregion
 
         #region Helper Functions
+        /// <summary>
+        /// Sets up any values which would need to be cached
+        /// </summary>
+        private void CacheValues()
+        {
+            //Get the name of the type if it's not yet setup 
+            if (string.IsNullOrEmpty(m_TypeName))
+                m_TypeName = GetReadableTypeName();
+        }
 
         /// <summary>
-        /// Deletes this asset and Creates a new asset with the supplied Type in it's place
+        /// Draws an Object field but without the text in the centre of it
         /// </summary>
-        /// <param name="type">Type to change Variable to</param>
-        private void ChangeType(Type type)
+        /// <param name="position">Position to draw the Field at</param>
+        /// <param name="property">Serialised property to draw the object field of</param>
+        /// <param name="label">Label of the object field</param>
+        private void DrawClearObjectField(Rect position, SerializedProperty property, GUIContent label)
         {
 
-            //Show dialogue warning that this could be harmful
-            bool isAgreed = EditorUtility.DisplayDialog("Change Variable Type",
-                "Changing the variable type will break references to this variable.\n\nThis can not be undone.",
-                "Continue", "Cancel", DialogOptOutDecisionType.ForThisMachine, ChangeTypeDialogueDecisionKey);
+            //Property Fields can't have custom guistyles or else that would be the correct way to do it
 
+            //Set the text size to one so you can't see it
+            int fontSize = EditorStyles.objectField.fontSize;
+            EditorStyles.objectField.fontSize = 1; //can't use zero, but it isn't noticable at this sizeo
+            EditorGUI.PropertyField(position, property, label);
 
-            //if user wants to continue change type
-            if (isAgreed)
-            {
-                string path = AssetDatabase.GetAssetPath(target);
-                string parentFolder = System.IO.Path.GetDirectoryName(path);
-                ScriptableObject newAsset = ScriptableObject.CreateInstance(type);
-                newAsset.name = target.name + "copy";
-                AssetDatabase.DeleteAsset(path);
+            //reset font
+            EditorStyles.objectField.fontSize = fontSize;
+        }
 
-                AssetDatabase.CreateAsset(newAsset, path);
-                AssetDatabase.SaveAssets();
-                Selection.activeObject = newAsset;
-            }
+        /// <summary>
+        /// Gets the correct type name for the Generic property
+        /// </summary>
+        /// <returns></returns>
+        private string GetReadableTypeName()
+        {
+            //If it isn't a generic just pass return the class name
+            if (!fieldInfo.FieldType.IsGenericType)
+                return fieldInfo.FieldType.Name;
 
-        } 
-        #endregion
+            //Gets primitive names (e.g. Float instead of single)
+            var compiler = new Microsoft.CSharp.CSharpCodeProvider();
+            string readableName = compiler.GetTypeOutput(new System.CodeDom.CodeTypeReference(fieldInfo.FieldType.GetGenericArguments()[0]));
+
+            //Remove Namespace by finding last '.'
+            int lastIndex = readableName.LastIndexOf('.');
+            if (lastIndex >= 0 && lastIndex != readableName.Length - 1)
+                readableName = readableName.Substring(lastIndex + 1);
+
+            //Add variable to make clear it's a generic
+            return $"Variable<{readableName}>";
+
+        }
+
+        #endregion Helper Functions
 
     }
 }

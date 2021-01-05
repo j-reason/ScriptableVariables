@@ -85,7 +85,7 @@ namespace Variables {
                 }
 
                 //If it doen't have the attribute but it is of type Variable create a default Attribute for it
-                else if (!type.IsAbstract && !type.IsGenericType && typeof(Variable).IsAssignableFrom(type))
+                else if (!type.IsAbstract && !type.IsGenericType && typeof(Variable<>).IsAssignableFrom(type))
                 {
                     retVal.Add(type, new VariableMenuAttribute()
                     {

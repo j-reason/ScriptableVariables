@@ -9,7 +9,7 @@ namespace Variables
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [System.Serializable]
-    public class Variable<T> : Variable
+    public class Variable<T> : ScriptableObject
     {
         /// <summary>
         /// Default value of the variable, exposed in editor if T is serializable, should not be changed from game code without a good reason
@@ -83,7 +83,7 @@ namespace Variables
         }
     }
 
-    public abstract class Variable : ScriptableObject
-    { }
+    //public abstract class Variable : ScriptableObject
+    //{ }
 
 }
