@@ -12,9 +12,16 @@ namespace Variables
     public class Variable<T> : ScriptableObject
     {
         /// <summary>
-        /// Default value of the variable, exposed in editor if T is serializable, should not be changed from game code without a good reason
+        /// Value of the variable set in the inspector, used to set m_currentValue at the game starts
         /// </summary>
-        public T defaultValue;
+        [SerializeField]
+        private T m_defaultValue;
+
+        /// <summary>
+        /// Value of the variable at runtime, reset when the game starts
+        /// </summary>
+        [SerializeField]
+        protected T m_currentValue;
 
         /// <summary>
         /// If this is set to true, setting the same value will notify the observers
@@ -22,26 +29,20 @@ namespace Variables
         [HideInInspector]
         public bool allowValueRepeating;
 
-        [SerializeField]
-        protected T m_currentValue;
 
         /// <summary>
         /// Current value of the variable
         /// </summary>
-        public virtual T currentValue
+        public virtual T Value
         {
             get
             {
-                return m_currentValue;
+                return GetValue();
             }
+
             set
             {
-                // TODO: Make the comparer setable
-                if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(m_currentValue, value))
-                {
-                    m_currentValue = value;
-                    OnValueChanged?.Invoke(value);
-                }
+                SetValue(value);
             }
         }
 
@@ -56,7 +57,7 @@ namespace Variables
         /// <param name="variable"></param>
         public void SetValue(Variable<T> variable)
         {
-            currentValue = variable.currentValue;
+            SetValue(variable.Value);
         }
 
         /// <summary>
@@ -65,25 +66,32 @@ namespace Variables
         /// <param name="variable"></param>
         public void SetValue(T value)
         {
-            currentValue = value;
+            // TODO: Make the comparer setable
+            if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(), value))
+            {
+                m_currentValue = value;
+                OnValueChanged?.Invoke(value);
+            }
+
         }
+
+        /// <summary>
+        /// Get current Value of the Variable
+        /// </summary>
+        /// <returns>Value of the variable</returns>
+        public T GetValue()
+        {
+            return m_currentValue;
+        }
+
 
         private void OnEnable()
         {
-            currentValue = defaultValue;
+            //set the current Variable to default on start
+            SetValue(m_defaultValue);
         }
 
-        public static implicit operator T(Variable<T> variable)
-        {
-            if (variable == null)
-            {
-                return default;
-            }
-            return variable.currentValue;
-        }
+        public static implicit operator T(Variable<T> variable) => variable.Value;
     }
-
-    //public abstract class Variable : ScriptableObject
-    //{ }
 
 }
