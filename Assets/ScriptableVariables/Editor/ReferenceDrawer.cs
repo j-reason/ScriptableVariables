@@ -74,9 +74,7 @@ namespace Variables.Editor
             FindProperties(property);
             int height = (useConstant.boolValue) ? constantValue.CountInProperty() : 1;
 
-            return 20 * height;
-
-
+            return (EditorGUIUtility.singleLineHeight * height) + (EditorGUIUtility.standardVerticalSpacing * (height-1));
         }
 
         private void FindProperties(SerializedProperty property)
@@ -88,6 +86,7 @@ namespace Variables.Editor
                 variable = property.FindPropertyRelative("Variable");
 
         }
+
 
     }
 }

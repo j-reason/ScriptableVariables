@@ -32,7 +32,7 @@ namespace Variables.Editor
         {
             //set up values
             m_currentValue = serializedObject.FindProperty("m_currentValue");
-            m_defaultValue = serializedObject.FindProperty("defaultValue");
+            m_defaultValue = serializedObject.FindProperty("m_defaultValue");
             m_TypeName = VariableMenuUtility.CachedAttributes[target.GetType()].GetNameOnly();
         }
 
@@ -50,11 +50,12 @@ namespace Variables.Editor
 
                 //display and apply property
                 EditorGUILayout.PropertyField(_property, new GUIContent(_property.propertyType.ToString()), true);
-                serializedObject.ApplyModifiedProperties();
+                
             }
 
             EditorGUILayout.Space();
-            DropAreaGUI();
+            serializedObject.ApplyModifiedProperties();
+            serializedObject.UpdateIfRequiredOrScript();
 
         }
         #endregion
@@ -83,35 +84,7 @@ namespace Variables.Editor
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
         }
 
-        public void DropAreaGUI()
-        {
-            Event evt = Event.current;
-            Rect drop_area = GUILayoutUtility.GetRect(0.0f, 50.0f, GUILayout.ExpandWidth(true));
-            GUI.Box(drop_area, "Add Trigger");
-
-            switch (evt.type)
-            {
-                case EventType.DragUpdated:
-                case EventType.DragPerform:
-                    if (!drop_area.Contains(evt.mousePosition))
-                        return;
-
-                    DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-
-                    if (evt.type == EventType.DragPerform)
-                    {
-                        DragAndDrop.AcceptDrag();
-
-                        foreach (UnityEngine.Object dragged_object in DragAndDrop.objectReferences)
-                        {
-                            // Do On Drag Stuff here
-                        }
-                    }
-                    break;
-            }
-        }
-
-
+      
         #endregion GUI Functions
 
         #region Helper Functions

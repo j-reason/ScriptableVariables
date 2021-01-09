@@ -10,7 +10,7 @@ namespace Variables.Editor
     /// <summary>
     /// Custom Property Drawer for Variables
     /// </summary>
-    [CustomPropertyDrawer(typeof(Variable<>), true)]
+    [CustomPropertyDrawer(typeof(Variable<>), false)]
     public class VariableDrawer : PropertyDrawer
     {
 
@@ -51,6 +51,8 @@ namespace Variables.Editor
                 property.serializedObject.ApplyModifiedProperties();
             EditorGUI.EndProperty();
 
+            ObjectPickerGUI(property, position);
+
             //Deal with object draggin
             DragGUI(position);
         }
@@ -62,6 +64,35 @@ namespace Variables.Editor
         /// This function fixes the visuals of the Drag and Drop
         /// </summary>
         /// <param name="position">position of the property</param>
+
+
+        private void ObjectPickerGUI(SerializedProperty property, Rect position)
+        {
+            //Gets the position we expect to find the picker button
+            float size = position.height; //the button is square so this will probably be fine
+            Rect rectPicker = new Rect(position.xMax - size, position.y, size, size);
+
+            //EditorGUI.DrawRect(rectPicker, new Color(1, 0, 0, 0.5f));
+
+            //Only mouse up is registered so we check if mouse-up happens over the picker
+            Event e = Event.current;
+            if (e.type == EventType.MouseUp && rectPicker.Contains(e.mousePosition))
+            {
+                Debug.Log($"Filter: t:{GetProabableName()}");
+
+                EditorGUIUtility.ShowObjectPicker<Object>(property.objectReferenceValue, false, $"t:{GetProabableName()}", EditorGUIUtility.GetObjectPickerControlID());
+                //property.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
+
+                property.serializedObject.ApplyModifiedProperties();
+            }
+            else
+            {
+                Debug.Log($"Event: {e.type}");
+            }
+
+        }
+
+
         private void DragGUI(Rect position)
         {
             //Check if mouse is hovering over the property and that it is dragging something
@@ -132,7 +163,16 @@ namespace Variables.Editor
 
             //Add variable to make clear it's a generic
             return $"Variable<{readableName}>";
+        }
 
+        private string GetProabableName()
+        {
+            //If it isn't a generic just pass return the class name
+            if (!fieldInfo.FieldType.IsGenericType)
+                return fieldInfo.FieldType.Name;
+
+
+            return fieldInfo.FieldType.GetGenericArguments()[0].Name + "Variable";
         }
 
         #endregion Helper Functions

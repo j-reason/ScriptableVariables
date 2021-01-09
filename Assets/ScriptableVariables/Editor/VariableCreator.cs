@@ -9,6 +9,9 @@ using UnityEditor;
 namespace Variables.Editor
 {
 
+    /// <summary>
+    /// Custom Editor window for Creating Variable<> Classes
+    /// </summary>
     public class VariableCreator : EditorWindow
     {
 
@@ -20,37 +23,35 @@ namespace Variables.Editor
         private bool m_showAdvanced;
         private string m_namespace = "Variables.Types";
         private string AssetPath = "";
+
         private GUIStyle richLabel;
         private GUIStyle postFoldout;
 
         // Add menu named "My Window" to the Window menu
-        [MenuItem("Tools/Create Variable")]
+        [MenuItem("Tools/Create Variable Type")]
         public static void Open()
         {
             // Get existing open window or if none, make a new one:
-            VariableCreator window = (VariableCreator)EditorWindow.GetWindow<VariableCreator>(true, "Create new Variable", true);
-            window.AssetPath = EditorPrefs.GetString("VariableAssetPath", "Scripts/Variable Types");
+            VariableCreator window = (VariableCreator)EditorWindow.GetWindow<VariableCreator>(true, "Create new Variable", true);          
             window.Show();
+        }
+
+
+        private void OnEnable()
+        {
+            richLabel = new GUIStyle(EditorStyles.label);
+            richLabel.richText = true;
+
+            postFoldout = new GUIStyle(EditorStyles.foldoutHeader);
+            postFoldout.imagePosition = ImagePosition.ImageLeft;
+            postFoldout.padding = new RectOffset(-120, 0, 0, 0);
+            postFoldout.border = new RectOffset(120, 0, 0, 0);
+
+            AssetPath = EditorPrefs.GetString("VariableAssetPath", "Scripts/Variable Types");
         }
 
         private void OnGUI()
         {
-            if (richLabel == null)
-            {
-                richLabel = new GUIStyle(EditorStyles.label);
-                richLabel.richText = true;
-            }
-
-            if (postFoldout == null)
-            {
-                postFoldout = new GUIStyle(EditorStyles.foldoutHeader);
-                postFoldout.imagePosition = ImagePosition.ImageLeft;
-                postFoldout.padding = new RectOffset(-120, 0, 0, 0);
-                postFoldout.border = new RectOffset(120, 0, 0, 0);
-            }
-
-
-
             TypeGUI();
             SettingsGUI();
             CreationGUI();
