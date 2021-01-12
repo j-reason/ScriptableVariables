@@ -1,6 +1,7 @@
 # Generic Scriptable Variables
 [![Unity 2020.1+](https://img.shields.io/badge/Unity-2020.1%2B-blue.svg)](https://unity3d.com/get-unity/download)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://tldrlegal.com/license/mit-license)
+[![openupm](https://img.shields.io/npm/v/com.jreason.scriptablevariables?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.jreason.scriptablevariables/)
 
 Scriptable Variables is package to implement variables in Unity using Scriptable Objects, taking advantage of Unity 2020.1 ability to serialize generic fields.    
 
