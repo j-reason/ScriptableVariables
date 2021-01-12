@@ -1,0 +1,10 @@
+{
+    "name": "jreason.ScriptableVariables.Editor",
+    "references": [
+      "jreason.ScriptableVariables"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}
