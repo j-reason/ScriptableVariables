@@ -19,6 +19,9 @@ namespace Variables.Editor
         //Readable name of the type
         private string m_TypeName;
 
+        //default font size of object field
+        private int m_defaultFontSize = 0;
+
         #endregion Private Variables
 
         #region Unity Functions
@@ -78,17 +81,13 @@ namespace Variables.Editor
             Event e = Event.current;
             if (e.type == EventType.MouseUp && rectPicker.Contains(e.mousePosition))
             {
-                Debug.Log($"Filter: t:{GetProabableName()}");
 
                 EditorGUIUtility.ShowObjectPicker<Object>(property.objectReferenceValue, false, $"t:{GetProabableName()}", EditorGUIUtility.GetObjectPickerControlID());
                 //property.objectReferenceValue = EditorGUIUtility.GetObjectPickerObject();
 
                 property.serializedObject.ApplyModifiedProperties();
             }
-            else
-            {
-                Debug.Log($"Event: {e.type}");
-            }
+
 
         }
 
@@ -120,6 +119,9 @@ namespace Variables.Editor
             //Get the name of the type if it's not yet setup 
             if (string.IsNullOrEmpty(m_TypeName))
                 m_TypeName = GetReadableTypeName();
+
+            if (m_defaultFontSize == 0)
+                m_defaultFontSize = EditorStyles.objectField.fontSize;
         }
 
         /// <summary>
@@ -133,13 +135,11 @@ namespace Variables.Editor
 
             //Property Fields can't have custom guistyles or else that would be the correct way to do it
 
-            //Set the text size to one so you can't see it
-            int fontSize = EditorStyles.objectField.fontSize;
             EditorStyles.objectField.fontSize = 1; //can't use zero, but it isn't noticable at this sizeo
             EditorGUI.PropertyField(position, property, label);
 
             //reset font
-            EditorStyles.objectField.fontSize = fontSize;
+            EditorStyles.objectField.fontSize = m_defaultFontSize;
         }
 
         /// <summary>
