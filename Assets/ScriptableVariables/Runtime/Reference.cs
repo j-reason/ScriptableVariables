@@ -12,40 +12,43 @@ namespace Variables
     {
 
         #region Serialised Fields
-        [SerializeField,Tooltip("Reference to the Variable Asset")]
+        [SerializeField, Tooltip("Reference to the Variable Asset")]
         private Variable<T> Variable;
 
         [SerializeField, Tooltip("Set to true if you don't want to reference a Variable")]
-        private bool UseConstant = true;
+        private bool m_useLocal = true;
 
         [SerializeField, Tooltip("Where value is stored if UseConstant is set to true")]
-        private T ConstantValue;
+        private T m_localValue;
 
         #endregion Serialised Fields
+
+        private Action<T> m_onLocalChange;
+
 
         #region Contructors
         public Reference() { }
 
         public Reference(T value) : this()
         {
-            UseConstant = true;
-            ConstantValue = value;
+            m_useLocal = true;
+            m_localValue = value;
         }
         #endregion Contructors
 
         /// <summary>
         /// Current Value of the reference, Either stored in the referenced variable, or stored by the reference itself
         /// </summary>
-        public T Value
-        {
-            get
-            {
-                return UseConstant ? ConstantValue : Variable.Value; ;
+        public T Value {
+            get {
+                return m_useLocal ? m_localValue : Variable.Value;
             }
-            set
-            {
-                if (UseConstant)
-                    ConstantValue = value;
+            set {
+                if (m_useLocal)
+                {
+                    m_localValue = value;
+                    m_onLocalChange?.Invoke(value);
+                }
                 else
                     Variable.Value = value;
             }
@@ -55,32 +58,27 @@ namespace Variables
         /// <summary>
         /// Invoked when the value of the refence changes
         /// </summary>
-        public Action<T> OnValueChanged
-        {
-            get
-            {
-                if (UseConstant)
-                {
-                    return new Action<T>(_ =>
-                    {
-                        
-                    });
-                }
-                else
-                {
-                    return Variable.OnValueChanged;
-                }
+        public event Action<T> OnValueChanged {
+            add {
+
+                if (!m_useLocal && Variable != null)
+                    Variable.OnValueChanged += value;
+
+                m_onLocalChange += value;
+
             }
-            set
-            {
-                if (!UseConstant)
-                {
-                    Variable.OnValueChanged = value;
-                }
+            remove {
+
+                if (!m_useLocal && Variable != null)
+                    Variable.OnValueChanged -= value;
+
+                m_onLocalChange -= value;
+
             }
         }
-    
-        
+
+
         public static implicit operator T(Reference<T> value) => value.Value;
     }
+
 }

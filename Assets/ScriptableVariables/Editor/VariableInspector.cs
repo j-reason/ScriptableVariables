@@ -48,14 +48,22 @@ namespace Variables.Editor
             {
                 _property.isExpanded = true; //force property to be expanded (e.g. Quaternions)
 
+                EditorGUI.BeginChangeCheck();
+           
                 //display and apply property
                 EditorGUILayout.PropertyField(_property, new GUIContent(_property.propertyType.ToString()), true);
-                
+
+                serializedObject.ApplyModifiedProperties();
+                serializedObject.UpdateIfRequiredOrScript();
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    EditorVariableUtility.InvokeVariableEvent(target);
+                } 
             }
 
             EditorGUILayout.Space();
-            serializedObject.ApplyModifiedProperties();
-            serializedObject.UpdateIfRequiredOrScript();
+            
 
         }
         #endregion
