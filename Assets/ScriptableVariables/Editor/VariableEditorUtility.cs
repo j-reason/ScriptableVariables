@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEditor;
 
 namespace Variables.Editor
 {
@@ -38,6 +39,27 @@ namespace Variables.Editor
                BindingFlags.NonPublic | BindingFlags.Instance
                ).GetValue(variable);
         }
+
+
+        public static void InvokeVariableEvent(dynamic variable)
+        {
+            dynamic value = variable.Value;
+            if (!EditorApplication.isPlaying)
+                value = GetDefaultValue(variable);
+
+            variable.OnValueChanged?.Invoke(value);
+        }
+
+        public static void InvokeLocalReferenceEvent(dynamic reference)
+        {
+            dynamic value = reference.m_localValue;
+            
+
+
+        }
+
+
+
 
     }
 
