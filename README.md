@@ -25,7 +25,7 @@ The package will available on the [openupm registry](https://openupm.com).
 * You can install it via [openupm-cli](https://github.com/openupm/openupm-cli)  
 
 **Alternatively**  
-Download the latest release Github
+Download the [latest release](https://github.com/j-reason/ScriptableVariables/releases) on Github
 
 ## Usage
 There are two main classes in the package: `Variable<>` and `Reference<>` 
