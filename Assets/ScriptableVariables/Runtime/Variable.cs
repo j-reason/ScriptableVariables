@@ -29,7 +29,6 @@ namespace Variables
         [HideInInspector]
         public bool allowValueRepeating;
 
-
         /// <summary>
         /// Current value of the variable
         /// </summary>
@@ -88,10 +87,12 @@ namespace Variables
         private void OnEnable()
         {
             //set the current Variable to default on start
-            SetValue(m_defaultValue);
+            SetValue(Utility.DeepCopy(m_defaultValue));
         }
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
+
+
     }
 
 }
