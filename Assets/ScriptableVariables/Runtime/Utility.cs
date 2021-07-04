@@ -23,5 +23,20 @@ namespace Variables
             }
         }
 
+        public static T TryDeepCopy<T>(T instance)
+        {
+            try
+            {
+               return DeepCopy(instance);
+                 
+            }
+            catch
+            {
+                return instance;
+            }
+        }
+
+
+
     }
 }
