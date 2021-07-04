@@ -87,7 +87,7 @@ namespace Variables
         private void OnEnable()
         {
             //set the current Variable to default on start
-            SetValue(Utility.DeepCopy(m_defaultValue));
+            SetValue(Utility.TryDeepCopy(m_defaultValue));
         }
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
