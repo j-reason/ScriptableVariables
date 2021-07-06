@@ -2,6 +2,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Variables
 {
     /// <summary>
@@ -32,15 +36,12 @@ namespace Variables
         /// <summary>
         /// Current value of the variable
         /// </summary>
-        public virtual T Value
-        {
-            get
-            {
+        public virtual T Value {
+            get {
                 return GetValue();
             }
 
-            set
-            {
+            set {
                 SetValue(value);
             }
         }
@@ -84,11 +85,21 @@ namespace Variables
         }
 
 
+
+
         private void OnEnable()
         {
-            //set the current Variable to default on start
-            SetValue(Utility.TryDeepCopy(m_defaultValue));
+#if UNITY_EDITOR
+            if (m_defaultValue != null)
+                UnityEditor.EditorUtility.CopySerializedManagedFieldsOnly(m_defaultValue, m_currentValue);
+            else
+                m_currentValue = default;
+            OnValueChanged?.Invoke(m_defaultValue);
+#else
+            SetValue(m_currentValue);
+#endif
         }
+
 
         public static implicit operator T(Variable<T> variable) => variable.Value;
 
