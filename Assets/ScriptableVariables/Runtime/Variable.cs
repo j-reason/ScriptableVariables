@@ -90,10 +90,11 @@ namespace Variables
         private void OnEnable()
         {
 #if UNITY_EDITOR
-            if (m_defaultValue != null)
+            if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive)
                 UnityEditor.EditorUtility.CopySerializedManagedFieldsOnly(m_defaultValue, m_currentValue);
             else
-                m_currentValue = default;
+                m_currentValue = m_defaultValue;
+
             OnValueChanged?.Invoke(m_defaultValue);
 #else
             SetValue(m_currentValue);
