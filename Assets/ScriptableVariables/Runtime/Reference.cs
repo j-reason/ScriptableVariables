@@ -39,11 +39,14 @@ namespace Variables
         /// <summary>
         /// Current Value of the reference, Either stored in the referenced variable, or stored by the reference itself
         /// </summary>
-        public T Value {
-            get {
+        public T Value
+        {
+            get
+            {
                 return m_useLocal ? m_localValue : Variable.Value;
             }
-            set {
+            set
+            {
                 if (m_useLocal)
                 {
                     m_localValue = value;
@@ -58,8 +61,10 @@ namespace Variables
         /// <summary>
         /// Invoked when the value of the refence changes
         /// </summary>
-        public event Action<T> OnValueChanged {
-            add {
+        public event Action<T> OnValueChanged
+        {
+            add
+            {
 
                 if (!m_useLocal && Variable != null)
                     Variable.OnValueChanged += value;
@@ -67,7 +72,8 @@ namespace Variables
                 m_onLocalChange += value;
 
             }
-            remove {
+            remove
+            {
 
                 if (!m_useLocal && Variable != null)
                     Variable.OnValueChanged -= value;
@@ -77,6 +83,27 @@ namespace Variables
             }
         }
 
+
+        /// <summary>
+        /// Sets the variable reference
+        /// If null sets the variable to use the local value
+        /// 
+        /// </summary>
+        /// <param name="variable">Variable to set as reference</param>
+        public void SetReference(Variable<T> variable)
+        {
+            //if this reference isn't set to local and there are events remove them from the variable reference
+            if (!m_useLocal && Variable != null && m_onLocalChange != null)
+                Variable.OnValueChanged -= m_onLocalChange;
+
+            //Set the variable and if check if it's null
+            Variable = variable;
+            m_useLocal = (variable == null);
+
+            //If the variable isn't null add all of the event listeners to it's event
+            if (!m_useLocal && m_onLocalChange != null)
+                Variable.OnValueChanged += m_onLocalChange;
+        }
 
         public static implicit operator T(Reference<T> value) => value.Value;
     }
