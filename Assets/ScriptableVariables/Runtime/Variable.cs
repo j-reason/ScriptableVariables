@@ -89,6 +89,9 @@ namespace Variables
 
         private void OnEnable()
         {
+
+
+            //If in the editor do a deep copy else when the editor stops the m_defaultValue will be a pointer to the m_defaultValue
 #if UNITY_EDITOR
             if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive)
                 UnityEditor.EditorUtility.CopySerializedManagedFieldsOnly(m_defaultValue, m_currentValue);
@@ -97,7 +100,8 @@ namespace Variables
 
             OnValueChanged?.Invoke(m_defaultValue);
 #else
-            SetValue(m_currentValue);
+            //If not in the Editor just Set the Current Value to be the default Value
+            SetValue(m_defaultValue);
 #endif
         }
 
