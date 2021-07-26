@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 using UnityEditor;
@@ -52,11 +53,73 @@ namespace Variables.Editor
 
         public static void InvokeLocalReferenceEvent(dynamic reference)
         {
-            dynamic value = reference.m_localValue;
-            
-
-
+            dynamic value = reference.m_localValue;         
         }
+
+        public static void AttachAssetTo(ScriptableObject asset,Object newRoot)
+        {
+            string path = AssetDatabase.GetAssetPath(asset);
+            
+        }
+
+        public static void AttachAssetTo(ScriptableObject asset, string newPath)
+        {
+            string path = AssetDatabase.GetAssetPath(asset);
+
+            if (path.Equals(newPath))
+                return;
+
+            Debug.Log(newPath);
+            Object[] data = AssetDatabase.LoadAllAssetsAtPath(path);
+
+
+            foreach (ScriptableObject dataObject in data)
+            {
+                AssetDatabase.RemoveObjectFromAsset(dataObject);
+                AssetDatabase.AddObjectToAsset(dataObject, newPath);
+            }
+
+            AssetDatabase.DeleteAsset(path);
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+
+        public static void DeattachAsset(ScriptableObject asset)
+        {
+
+            bool isSub = AssetDatabase.IsSubAsset(asset);
+            string path = AssetDatabase.GetAssetPath(asset);
+            Object[] data = AssetDatabase.LoadAllAssetsAtPath(path);
+
+            string Directory = System.IO.Path.GetDirectoryName(path);
+
+            foreach (ScriptableObject dataObject in data)
+            {
+                if ((isSub && dataObject.Equals(asset)) || (!isSub))
+                {
+                    Debug.Log("Unzipping: " + dataObject.name);
+                    try
+                    {
+                        AssetDatabase.RemoveObjectFromAsset(dataObject);
+                        AssetDatabase.SaveAssets();
+
+                        string uniquePath = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(Directory, dataObject.name + ".asset"));
+
+                        AssetDatabase.CreateAsset(dataObject, uniquePath);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+
 
 
 

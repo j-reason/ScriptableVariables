@@ -13,7 +13,7 @@ namespace Variables
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [System.Serializable]
-    public class Variable<T> : ScriptableObject
+    public class Variable<T> : Variable
     {
         /// <summary>
         /// Value of the variable set in the inspector, used to set m_currentValue at the game starts
@@ -87,9 +87,11 @@ namespace Variables
 
 
 
+        #region Monobehaviour Functions
         private void OnEnable()
         {
 
+            //Set the current Value to be the default value
 
             //If in the editor do a deep copy else when the editor stops the m_defaultValue will be a pointer to the m_defaultValue
 #if UNITY_EDITOR
@@ -103,12 +105,23 @@ namespace Variables
             //If not in the Editor just Set the Current Value to be the default Value
             SetValue(m_defaultValue);
 #endif
-        }
+        } 
+        #endregion Monobehaviour Functions
 
 
+        /// <summary>
+        /// Implicit cast from Variable<T> type to T
+        /// </summary>
         public static implicit operator T(Variable<T> variable) => variable.Value;
 
 
     }
+
+    [System.Serializable]
+    public class Variable : ScriptableObject
+    {
+
+    }
+
 
 }
