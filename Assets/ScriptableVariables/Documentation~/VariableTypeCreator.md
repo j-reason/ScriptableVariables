@@ -5,16 +5,16 @@ Before being able to create a Variable Asset of a certain Type, that type needs 
 
 ## Settings
 
-**Filter:** Used to search the `ChangeType` dropdown to quickly find a C# Class.
-**Type:** *[required]* The new Variable Type to create. e.g
+**Filter:** Used to search the `ChangeType` dropdown to quickly find a C# Class.  
+**Type:** *[required]* The new Variable Type to create. e.g  
 
-**Menu Name:** How the Type will be organised in the Change-Type drop down.	(*'e.g. Default/Colour'*)
-**Menu Order:** The ordering of the Type in the Change-Type drop down.
-&nbsp;  - Lower Numbers will be displayed and the top.
-&nbsp; - A gap of 10 or higher will insert a line break in the menu.
+**Menu Name:** How the Type will be organised in the Change-Type drop down.	(*'e.g. Default/Colour'*)  
+**Menu Order:** The ordering of the Type in the Change-Type drop down.  
+&nbsp;  - Lower Numbers will be displayed and the top.  
+&nbsp; - A gap of 10 or higher will insert a line break in the menu.  
 
-**Path:** Directory where .cs file holding the Variable Type will be saved in the project. This is local to the Assets folder.
-**Namespace:** The [Namespace](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/types/namespaces) of the Variable Type. (There shouldn't be any need to change this away from `Variables.type`)
+**Path:** Directory where .cs file holding the Variable Type will be saved in the project. This is local to the Assets folder.  
+**Namespace:** The [Namespace](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/types/namespaces) of the Variable Type. (There shouldn't be any need to change this away from `Variables.type`)  
 
 
  ## Changing Menu Name 

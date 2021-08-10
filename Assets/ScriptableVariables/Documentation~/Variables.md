@@ -5,7 +5,7 @@ Variables are assets which store data and live in the [Project Window](https://d
 
 ## Creation
 
-**Asset Creation**
+**Asset Creation**  
 Variables are assets created in the Unity Editor. A new Variable asset can be created from the '_Assets/Create/Variable_' menu or from the '**+**' Dropdown in the ProjectView. A Variable's type can be changed in the '_Type_' Dropdown.
 ![Example](Media/VariableCreation.gif?raw=true)
 
@@ -19,11 +19,11 @@ More details about the *Create Variable Type* window can be found [here](Variabl
 ## API
 **Warning!** You probably want to be using [`Reference<T>`](References.md) in your code instead of `Variable<T>.`
 
-**Decleration**
+**Decleration**  
 `public Variable<T> ExampleVariable` where `T` is the Type of Variable.
 `public Variable<float> FloatVariable` *(example)*
 
-**Parameters**
+**Parameters**  
 
 | Type          | Name                 | Description|
 |--------------|-----------------------|--------------------------------------------------------------------------------------------------|
@@ -33,7 +33,7 @@ More details about the *Create Variable Type* window can be found [here](Variabl
 
   
 
-**Functions**
+**Functions**  
 **`void SetValue (T value)`**   
    Sets the instance value of the Variable. Can also be set through `Variable.Value`.
    

@@ -6,17 +6,17 @@ References are how [Variables](Variables.md) are accessed in Code. References ca
 ## API
 *Namespace:* Variables 
 
-**Decleration**
+**Decleration**  
 `public Reference<T> ExampleReference` where `T` is the value type stored in the variable being referenced.
 `public Reference<float> FloatReference` *(example)*
 
-**Parameters**
+**Parameters**  
 | Type          | Name                 | Description|
 |--------------|-----------------------|------------|
 | `T`          | *Value*               | Value of the `Variable` being references, or the local value of the Reference     |
 | `Action<T>`  | *OnValueChanged*      | An event which is called everytime `Value` is changed      |
 
-**Functions**
+**Functions**  
 **`void SetReference(Variable<T> variable)`**
 Sets the Variable linked to the Reference.
 
