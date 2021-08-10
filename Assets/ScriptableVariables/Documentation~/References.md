@@ -1,7 +1,7 @@
 # References
-References are how [Variables]() are accessed in Code. References can also have a hold a local Value if they are not linked the a Variable Asset.
+References are how [Variables](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Variables.md) are accessed in Code. References can also have a hold a local Value if they are not linked the a Variable Asset.
 
-[Inspector]()
+[Inspector](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Media/ReferenceInspector.gif)
 
 ## API
 *Namespace:* Variables 

@@ -17,10 +17,10 @@ Unity 2020.1.0 or later versions.
 
 ## Installation  
 The package is available on the [openupm registry](https://openupm.com) at `com.jreason.scriptablevariables`.  
-More information can be found at the [Installation page]().
+More information can be found at the [Installation page](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Installation.md).
 
 ## Usage
-There are two main classes in the package: [`Variable<>`]() and [`Reference<>`]() 
+There are two main classes in the package: [`Variable<>`](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Variables.md) and [`Reference<>`](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/References.md) 
 
 ### Variable
 Variables are assets created in the Unity Editor which store data.
@@ -54,7 +54,7 @@ References are how variables are accessed in Code.
 ```
 
 
-More information can be found in the [Variable page]() and [Reference page]()
+More information can be found in the [Variable page](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Variables.md) and [Reference page](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/References.md)
 
 
 ## Credits
