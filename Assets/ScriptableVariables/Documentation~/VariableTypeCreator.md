@@ -1,32 +1,34 @@
-# Installation
-There are multiple methods to install this package.
-The preferred method is using a Scoped Registery since it allows you to easily keep the package update or select a previous Release Version.
+# Create Variable Type Tool
 
-## Scoped Registery
-The package is available on the [openupm registry](https://openupm.com/packages/com.jreason.scriptablevariables/), you can add it to the project as a [scoped registry](https://docs.unity3d.com/Manual/upm-scoped.html).
+Before being able to create a Variable Asset of a certain Type, that type needs to be created as a Class. The nessary code to create a Variable type can generate from the '**Type**' Dropdown by clicking '**Create new**', this only needs to be done once per type.
+![Editor](Media/VariableTypeCreator.png?raw=true)
 
-**Adding the Scoped Registery**
-Before adding this package using the Package Manager you need to add OpenUPM to your Project.
+## Settings
 
- - Open the Package Manager Settings `Edit > Project Settings > PackageManager`
- - Add a Scoped Registery
-	 - Name: `OpenUPM` (The name can be anything)
-	 - URL: `https://package.openupm.com`
-	 - Scope: `com.jreason.scriptablevariables`
- - Click 'Save'
-(If you are already using other packages on OpenUPM you can just add the Scope to the Registery already setup.)
+**Filter:** Used to search the `ChangeType` dropdown to quickly find a C# Class.
+**Type:** *[required]* The new Variable Type to create. e.g
 
-**Add the Package**
- - Open the [Package Manager](https://docs.unity3d.com/Manual/upm-ui.html) `Window > Package Manager`
- - Set the the packages [drop-down menu](https://docs.unity3d.com/Manual/upm-ui-filter.html) to 'My Registries'
- - Install `Generic Scriptable Variables`
+**Menu Name:** How the Type will be organised in the Change-Type drop down.	(*'e.g. Default/Colour'*)
+**Menu Order:** The ordering of the Type in the Change-Type drop down.
+&nbsp;  - Lower Numbers will be displayed and the top.
+&nbsp; - A gap of 10 or higher will insert a line break in the menu.
 
-## Git
-You can use the following path to add the latest release from GIT using the Package Manager.
-`https://github.com/j-reason/ScriptableVariables.git?path=/Assets/ScriptableVariables`
+**Path:** Directory where .cs file holding the Variable Type will be saved in the project. This is local to the Assets folder.
+**Namespace:** The [Namespace](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/types/namespaces) of the Variable Type. (There shouldn't be any need to change this away from `Variables.type`)
 
-Follow the [Unity Documentation](https://docs.unity3d.com/Manual/upm-ui-giturl.html) for more information.
-Information on how To declare a specific revision can be found [here.](https://docs.unity3d.com/Manual/upm-git.html#revision)
 
-## File
-Alternatively you find [all releases](https://github.com/j-reason/ScriptableVariables/releases) as a .unitypackage on GitHub.
+ ## Changing Menu Name 
+ Currently there is no way to change `Menu Order` or `Menu Name` from the GUI.
+ You can change both of these by editing the .cs file of the Variable.
+
+```cs
+using Variables;
+
+namespace Variables.Types
+{
+[VariableMenu(menuName = "Example/ExampleClass", order = 100)]
+public class ExampleClassVariable : Variable<ExampleClass> { }
+}
+```
+
+

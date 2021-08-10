@@ -17,10 +17,10 @@ Unity 2020.1.0 or later versions.
 
 ## Installation  
 The package is available on the [openupm registry](https://openupm.com) at `com.jreason.scriptablevariables`.  
-More information can be found at the [Installation page]().
+More information can be found at the [Installation page](Assets/ScriptableVariables/Documentation~/Installation.md).
 
 ## Usage
-There are two main classes in the package: [`Variable<>`]() and [`Reference<>`]() 
+There are two main classes in the package: [`Variable<>`](Assets/ScriptableVariables/Documentation~/Variables.md) and [`Reference<>`](Assets/ScriptableVariables/Documentation~/References.md) 
 
 ### Variable
 Variables are assets created in the Unity Editor which store data.
