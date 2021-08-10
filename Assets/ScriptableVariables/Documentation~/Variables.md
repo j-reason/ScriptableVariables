@@ -7,13 +7,13 @@ Variables are assets which store data and live in the [Project Window](https://d
 
 **Asset Creation**
 Variables are assets created in the Unity Editor. A new Variable asset can be created from the '_Assets/Create/Variable_' menu or from the '**+**' Dropdown in the ProjectView. A Variable's type can be changed in the '_Type_' Dropdown.
-[Example](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Media/VariableCreation.gif)
+[Example](Assets/ScriptableVariables/Documentation%7E/Media/VariableCreation.gif?raw=true)
 
 **Variable Types**  
 Before being able to create a Variable Asset of a certain Type, that type needs to be created as a Class. The nessary code to create a Variable type can generate from the '**Type**' Dropdown by clicking '**Create new**', this only needs to be done once per type. Some Types are pre-setup such as [primitives](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types) and some more common Unity classes.
 More details about the *Create Variable Type* window can be found [here](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/VariableTypeCreator.md)
 
-[Example](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Media/VariableTypeCreation.gif)
+[Example](Assets/ScriptableVariables/Documentation%7E/Media/VariableTypeCreation.gif?raw=true)
 
 
 ## API

@@ -1,7 +1,7 @@
 # Create Variable Type Tool
 
 Before being able to create a Variable Asset of a certain Type, that type needs to be created as a Class. The nessary code to create a Variable type can generate from the '**Type**' Dropdown by clicking '**Create new**', this only needs to be done once per type.
-[Editor](https://github.com/j-reason/ScriptableVariables/blob/main/Assets/ScriptableVariables/Documentation%7E/Media/VariableTypeCreator.png)
+[Editor](Assets/ScriptableVariables/Documentation%7E/Media/VariableTypeCreator.png?raw=true)
 
 ## Settings
 
