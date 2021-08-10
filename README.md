@@ -1,7 +1,5 @@
 # Generic Scriptable Variables
-[![Unity 2020.1+](https://img.shields.io/badge/Unity-2020.1%2B-blue.svg)](https://unity3d.com/get-unity/download)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://tldrlegal.com/license/mit-license)
-[![openupm](https://img.shields.io/npm/v/com.jreason.scriptablevariables?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.jreason.scriptablevariables/)
+[![Unity 2020.1+](https://img.shields.io/badge/Unity-2020.1%2B-blue.svg)](https://unity3d.com/get-unity/download) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://tldrlegal.com/license/mit-license) [![openupm](https://img.shields.io/npm/v/com.jreason.scriptablevariables?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.jreason.scriptablevariables/)
 
 Scriptable Variables is package to implement variables in Unity using Scriptable Objects, taking advantage of Unity 2020.1 ability to serialize generic fields.    
 
@@ -18,17 +16,11 @@ This package is considered to be a preview-package. This means:
 Unity 2020.1.0 or later versions.
 
 ## Installation  
-**Preferred:**  
-The package will available on the [openupm registry](https://openupm.com).  
-* Add it to the package manager as a [scoped registry](https://docs.unity3d.com/Manual/upm-scoped.html).  
--- **OR** -- 
-* You can install it via [openupm-cli](https://github.com/openupm/openupm-cli)  
-
-**Alternatively**  
-Download the [latest release](https://github.com/j-reason/ScriptableVariables/releases) on Github
+The package is available on the [openupm registry](https://openupm.com) at `com.jreason.scriptablevariables`.  
+More information can be found at the [Installation page]().
 
 ## Usage
-There are two main classes in the package: `Variable<>` and `Reference<>` 
+There are two main classes in the package: [`Variable<>`]() and [`Reference<>`]() 
 
 ### Variable
 Variables are assets created in the Unity Editor which store data.
@@ -62,9 +54,9 @@ References are how variables are accessed in Code.
 ```
 
 
+More information can be found in the [Variable page]() and [Reference page]()
+
 
 ## Credits
 * The theory for this package is based off [Ryan Hipple's Unite Talk](https://www.youtube.com/watch?v=raQ3iHhE_Kk "Youtube").  
 * The code is based off [Wolar-Games Implementation](https://github.com/Wolar-Games/unity-scriptable-object-variables "Github") and has been re-written for Unity 2020.1.
-	
-
