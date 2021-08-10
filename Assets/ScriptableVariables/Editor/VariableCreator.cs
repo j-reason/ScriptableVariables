@@ -23,6 +23,7 @@ namespace Variables.Editor
         private bool m_showAdvanced;
         private string m_namespace = "Variables.Types";
         private string AssetPath = "";
+        private string m_lastError;
 
         private GUIStyle richLabel;
         private GUIStyle postFoldout;
@@ -32,7 +33,7 @@ namespace Variables.Editor
         public static void Open()
         {
             // Get existing open window or if none, make a new one:
-            VariableCreator window = (VariableCreator)EditorWindow.GetWindow<VariableCreator>(true, "Create new Variable", true);          
+            VariableCreator window = (VariableCreator)EditorWindow.GetWindow<VariableCreator>(true, "Create Variable Type", true);          
             window.Show();
         }
 
@@ -41,6 +42,7 @@ namespace Variables.Editor
         {
             richLabel = new GUIStyle(EditorStyles.label);
             richLabel.richText = true;
+            richLabel.wordWrap = true;
 
             postFoldout = new GUIStyle(EditorStyles.foldoutHeader);
             postFoldout.imagePosition = ImagePosition.ImageLeft;
@@ -137,6 +139,11 @@ namespace Variables.Editor
             //Force to bottom of UI
             GUILayout.FlexibleSpace();
 
+            //Display last known error
+            if (!string.IsNullOrEmpty(m_lastError))
+                EditorGUILayout.LabelField($"<color=red>{m_lastError}</color>", richLabel);
+
+
             //Make buttons next to each other
             GUILayout.BeginHorizontal();
 
@@ -148,8 +155,16 @@ namespace Variables.Editor
             GUI.enabled = selectedType != null; //disable if type hasn't been selected
             if (GUILayout.Button("Create"))
             {
-                CreateVariableType(selectedType, Path.Combine(Application.dataPath, AssetPath), attribute, m_namespace);
-                Close();
+                try
+                {
+                    CreateVariableType(selectedType, Path.Combine(Application.dataPath, AssetPath), attribute, m_namespace);
+
+                    EditorPrefs.SetString("VariableAssetPath", AssetPath);
+                    Close();
+                }catch(Exception e)
+                {
+                    m_lastError = e.Message;
+                }
             }
 
             //end horizontal and re-enable UI

@@ -80,7 +80,14 @@ namespace Variables {
                 var attrbiute = type.GetCustomAttribute<VariableMenuAttribute>();
                 if (attrbiute != null)
                 {
-                    retVal.Add(type, attrbiute);
+                    if (type.IsSubclassOf(typeof(Variable))){
+                        retVal.Add(type, attrbiute);
+                    }
+                    else
+                    {
+                        UnityEngine.Debug.LogWarning($"The [VariableMenu] attribute can only be used on a class which inherits from Variable.\n" +
+                            $"Class: <color=#4B79F0> {type.FullName}</color>");
+                    }
                 }
 
                 //If it doen't have the attribute but it is of type Variable create a default Attribute for it
