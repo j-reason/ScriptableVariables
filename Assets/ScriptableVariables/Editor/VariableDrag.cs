@@ -130,6 +130,7 @@ namespace Variables.Editor
 
         static Rect getDropRect(Rect selectionRect)
         {
+            //in the project view if the mouse is above the top/bottom quater of a file, it presumes you want to place the object before/after that file so GetDropRect is a thinner version of the rect
             selectionRect.y += selectionRect.height / 4 + 1;
             selectionRect.height = selectionRect.height / 2 - 1;
             return selectionRect;

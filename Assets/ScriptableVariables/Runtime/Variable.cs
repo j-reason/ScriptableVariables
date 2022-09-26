@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -36,12 +37,15 @@ namespace Variables
         /// <summary>
         /// Current value of the variable
         /// </summary>
-        public virtual T Value {
-            get {
+        public virtual T Value
+        {
+            get
+            {
                 return GetValue();
             }
 
-            set {
+            set
+            {
                 SetValue(value);
             }
         }
@@ -95,17 +99,36 @@ namespace Variables
 
             //If in the editor do a deep copy else when the editor stops the m_defaultValue will be a pointer to the m_defaultValue
 #if UNITY_EDITOR
-            if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive)
-                UnityEditor.EditorUtility.CopySerializedManagedFieldsOnly(m_defaultValue, m_currentValue);
+            if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive && m_defaultValue is ICloneable defaultClonable)
+            {
+
+                m_currentValue = (T)defaultClonable.Clone();
+
+                //#TODO get CopySerializedManagedFieldsOnly for non IClonable types
+                //
+            }
+            else if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive)
+            {
+                Utility.TryDeepCopy(m_defaultValue, out m_currentValue);
+            }
             else
+            {
                 m_currentValue = m_defaultValue;
+            }
 
             OnValueChanged?.Invoke(m_defaultValue);
 #else
             //If not in the Editor just Set the Current Value to be the default Value
             SetValue(m_defaultValue);
 #endif
-        } 
+        }
+
+        private void OnDisable()
+        {
+            //Clear the currentValue
+            m_currentValue = default;
+        }
+
         #endregion Monobehaviour Functions
 
 

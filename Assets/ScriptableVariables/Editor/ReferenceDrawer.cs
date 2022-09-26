@@ -12,9 +12,12 @@ namespace Variables.Editor
         // Get properties
         SerializedProperty m_useLocal;
         SerializedProperty m_localValue;
-        SerializedProperty variable;
+        SerializedProperty m_variable;
+
+        bool m_isDraggingVariable = false;
 
 
+        bool m_showVariableField => m_isDraggingVariable || !m_useLocal.boolValue;
 
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Variables.Editor
             label = EditorGUI.BeginProperty(position, label, property);
             position = EditorGUI.PrefixLabel(position, label);
 
-            
+
 
             // Calculate rect for configuration button
             Rect buttonRect = new Rect(position);
@@ -53,6 +56,9 @@ namespace Variables.Editor
             // Store old indent level and set it to 0, the PrefixLabel takes care of it
             int indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
+
+            //check if a variable is being dragged over this property field
+            OnDrag(property,position);
 
             EditorGUI.BeginChangeCheck();
 
@@ -69,7 +75,7 @@ namespace Variables.Editor
             EditorGUI.BeginChangeCheck();
 
             EditorGUI.PropertyField(position,
-                m_useLocal.boolValue ? m_localValue : variable,
+                !m_showVariableField ? m_localValue : m_variable,
                 GUIContent.none, true);
 
             if (EditorGUI.EndChangeCheck())
@@ -83,25 +89,26 @@ namespace Variables.Editor
 
             EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
+
+            
         }
 
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             FindProperties(property);
-            int height = (m_useLocal.boolValue) ? m_localValue.CountInProperty() : 1;
+            int height = (!m_showVariableField) ? m_localValue.CountInProperty() : 1;
 
-            return (EditorGUIUtility.singleLineHeight * height) + (EditorGUIUtility.standardVerticalSpacing * (height-1));
+            return (EditorGUIUtility.singleLineHeight * height) + (EditorGUIUtility.standardVerticalSpacing * (height - 1));
         }
 
         private void FindProperties(SerializedProperty property)
         {
-                m_useLocal = property.FindPropertyRelative("m_useLocal");
+            m_useLocal = property.FindPropertyRelative("m_useLocal");
 
-                m_localValue = property.FindPropertyRelative("m_localValue");
+            m_localValue = property.FindPropertyRelative("m_localValue");
 
-                variable = property.FindPropertyRelative("Variable");
-
+            m_variable = property.FindPropertyRelative("Variable");
         }
 
         private void OnUseLocalChanged(SerializedProperty property)
@@ -149,6 +156,46 @@ namespace Variables.Editor
         }
 
 
+        /// <summary>
+        /// Deals with Objects being dragged over the reference field
+        /// </summary>
+        /// <param name="property">Main serialized property </param>
+        /// <param name="propertyRect">Rectangle to check dragging over</param>
+        private void OnDrag(SerializedProperty property, Rect propertyRect)
+        {
+            //Get the current Event
+            Event evt = Event.current;
+
+            //set dragging to false by default
+            m_isDraggingVariable = false;
+
+            //if the property isn't in local mode or mouse isn't over property return
+            if (!m_useLocal.boolValue || !propertyRect.Contains(evt.mousePosition))
+                return;
+
+            //Return if dragged object isn't a variable
+            if (DragAndDrop.objectReferences.Length != 1 || !(DragAndDrop.objectReferences[0] is Variable draggedVariable))
+                return;
+
+            //we know we are dragging a reference over the propertyField
+            m_isDraggingVariable = true; //this is used to update the GUI to swap to the VariableField while dragging
+
+            switch (evt.type)
+            {
+                case EventType.DragUpdated:
+                    //this never seems to be called
+                    break;
+
+                case EventType.DragPerform: //called when a succesfull drag and drop has happenned
+
+                    //update useLocal to false since we dragged a variable into the field
+                    m_useLocal.boolValue = false;
+                    property.serializedObject.ApplyModifiedProperties();
+                    OnUseLocalChanged(property);
+
+                    break;          
+            }
+        }
 
 
 
