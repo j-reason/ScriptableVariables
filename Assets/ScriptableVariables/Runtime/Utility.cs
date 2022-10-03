@@ -23,15 +23,6 @@ namespace Variables
             }
         }
 
-        public static T JsonCopy<T>(T instance)
-        {
-            T output = default;
-            string json = UnityEditor.EditorJsonUtility.ToJson(instance);
-            UnityEditor.EditorJsonUtility.FromJsonOverwrite(json, output);
-
-            return output;
-        }
-
         public static bool TryDeepCopy<T>(T instance, out T output)
         {
             try
@@ -43,21 +34,6 @@ namespace Variables
             {
                 UnityEngine.Debug.LogWarning($"Unable to DeepCopy type of {instance.GetType().Name}");
                 output =  instance;
-                return false;
-            }
-        }
-
-        public static bool TryJsonCopy<T>(T instance, out T output)
-        {
-            try
-            {
-                output = JsonCopy(instance);
-                return true;
-            }
-            catch
-            {
-                UnityEngine.Debug.LogWarning($"Unable to JsonCopy type of {instance.GetType().Name}");
-                output = instance;
                 return false;
             }
         }
