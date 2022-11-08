@@ -23,7 +23,7 @@ namespace Variables.Editor
         {
             //using reflection to set it
             variable.GetType().BaseType.GetField(
-                "m_defaultValue",
+                "m_value",
                 BindingFlags.NonPublic | BindingFlags.Instance
                 ).SetValue(variable, value);
         }
@@ -36,7 +36,7 @@ namespace Variables.Editor
         {
             //using reflection to get it
             return (T) variable.GetType().BaseType.GetField(
-               "m_defaultValue",
+               "m_value",
                BindingFlags.NonPublic | BindingFlags.Instance
                ).GetValue(variable);
         }
@@ -45,9 +45,6 @@ namespace Variables.Editor
         public static void InvokeVariableEvent(dynamic variable)
         {
             dynamic value = variable.Value;
-            if (!EditorApplication.isPlaying)
-                value = GetDefaultValue(variable);
-
             variable.OnValueChanged?.Invoke(value);
         }
 

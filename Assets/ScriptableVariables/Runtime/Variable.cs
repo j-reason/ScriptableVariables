@@ -1,11 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace Variables
 {
@@ -17,16 +12,11 @@ namespace Variables
     public class Variable<T> : Variable
     {
         /// <summary>
-        /// Value of the variable set in the inspector, used to set m_currentValue at the game starts
+        /// Value of the variable, accessible from the inspector
         /// </summary>
         [SerializeField]
-        private T m_defaultValue;
-
-        /// <summary>
-        /// Value of the variable at runtime, reset when the game starts
-        /// </summary>
-        [SerializeField]
-        protected T m_currentValue;
+        [UnityEngine.Serialization.FormerlySerializedAs("m_defaultValue")]
+        private T m_value;
 
         /// <summary>
         /// If this is set to true, setting the same value will notify the observers
@@ -73,7 +63,7 @@ namespace Variables
             // TODO: Make the comparer setable
             if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(), value))
             {
-                m_currentValue = value;
+                m_value = value;
                 OnValueChanged?.Invoke(value);
             }
 
@@ -85,51 +75,8 @@ namespace Variables
         /// <returns>Value of the variable</returns>
         public T GetValue()
         {
-            return m_currentValue;
+            return m_value;
         }
-
-
-
-
-        #region Monobehaviour Functions
-        private void OnEnable()
-        {
-
-            //Set the current Value to be the default value
-
-            //If in the editor do a deep copy else when the editor stops the m_defaultValue will be a pointer to the m_defaultValue
-#if UNITY_EDITOR
-            if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive && m_defaultValue is ICloneable defaultClonable)
-            {
-
-                m_currentValue = (T)defaultClonable.Clone();
-
-                //#TODO get CopySerializedManagedFieldsOnly for non IClonable types
-                //
-            }
-            else if (m_defaultValue != null && !m_defaultValue.GetType().IsPrimitive)
-            {
-                Utility.TryDeepCopy(m_defaultValue, out m_currentValue);
-            }
-            else
-            {
-                m_currentValue = m_defaultValue;
-            }
-
-            OnValueChanged?.Invoke(m_defaultValue);
-#else
-            //If not in the Editor just Set the Current Value to be the default Value
-            SetValue(m_defaultValue);
-#endif
-        }
-
-        private void OnDisable()
-        {
-            //Clear the currentValue
-            m_currentValue = default;
-        }
-
-        #endregion Monobehaviour Functions
 
 
         /// <summary>

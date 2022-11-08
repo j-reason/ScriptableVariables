@@ -19,9 +19,8 @@ namespace Variables.Editor
         const string ChangeTypeDialogueDecisionKey = "ScriptableVariables.ChangeTypeDialogue";
 
         #region Private Variables
-        //References to serialized propertyes
-        private SerializedProperty m_currentValue;
-        private SerializedProperty m_defaultValue;
+        //References to serialized properties
+        private SerializedProperty m_value;
 
         //Name of Variable Type
         private string m_TypeName;
@@ -31,8 +30,7 @@ namespace Variables.Editor
         public void OnEnable()
         {
             //set up values
-            m_currentValue = serializedObject.FindProperty("m_currentValue");
-            m_defaultValue = serializedObject.FindProperty("m_defaultValue");
+            m_value = serializedObject.FindProperty("m_value");
             m_TypeName = VariableMenuUtility.CachedAttributes[target.GetType()].GetNameOnly();
         }
 
@@ -41,17 +39,14 @@ namespace Variables.Editor
             //show TypeGUI
             TypeGUI();
 
-            //Show default value when not in play, else show currnet value
-            SerializedProperty _property = (EditorApplication.isPlaying) ? m_currentValue : m_defaultValue;
-
-            if (_property != null)
+            if (m_value != null)
             {
-                _property.isExpanded = true; //force property to be expanded (e.g. Quaternions)
+                m_value.isExpanded = true; //force property to be expanded (e.g. Quaternions)
 
                 EditorGUI.BeginChangeCheck();
            
                 //display and apply property
-                EditorGUILayout.PropertyField(_property, new GUIContent(_property.propertyType.ToString()), true);
+                EditorGUILayout.PropertyField(m_value, new GUIContent(m_value.propertyType.ToString()), true);
 
                 serializedObject.ApplyModifiedProperties();
                 serializedObject.UpdateIfRequiredOrScript();
