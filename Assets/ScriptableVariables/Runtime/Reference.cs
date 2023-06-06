@@ -105,6 +105,26 @@ namespace Variables
                 Variable.OnValueChanged += m_onLocalChange;
         }
 
+        /// <summary>
+        /// Try to get's the Variable that this reference points to.
+        /// 
+        /// Returns false if reference is set to local, or there is no variable
+        /// </summary>
+        /// <param name="variable">variable this reference points to</param>
+        /// <returns>Returns false if reference is set to local, or there is no variable</returns>
+        public bool TryGetVariable(out Variable<T> variable)
+        {
+            //Set out argument 
+            variable = Variable;
+
+            //return false if no variable            
+            if (m_useLocal || Variable == null) //could bundle this into one return but this is easier to read
+                return false;
+
+            return true;
+        }
+
+
         public static implicit operator T(Reference<T> value) => value.Value;
     }
 
