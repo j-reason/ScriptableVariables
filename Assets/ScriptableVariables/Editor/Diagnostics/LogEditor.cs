@@ -73,6 +73,9 @@ namespace Variables.Diagnostics.Editor
 
             var frame = trace.GetFrame(1);
             var frames = trace.GetFrames();
+
+            if (frame == null) return isExpanded;
+
             string reltaivePath = GetPathRelative(frame.GetFileName(), Application.dataPath);
 
             GUIStyle style = isOdd ? EditorStyles.label : s_darkBackground;
