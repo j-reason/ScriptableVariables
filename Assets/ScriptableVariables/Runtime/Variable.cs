@@ -24,6 +24,8 @@ namespace Variables
         [HideInInspector]
         public bool allowValueRepeating;
 
+        
+
         /// <summary>
         /// Current value of the variable
         /// </summary>
@@ -64,6 +66,16 @@ namespace Variables
             if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(), value))
             {
                 m_value = value;
+
+#if UNITY_EDITOR
+                if (LogOutput)
+                {
+                    Variables.Diagnostics.StackLogger.LogUsage(this);
+                    Debug.Log($"Set {name} to {value}");
+                }
+#endif
+
+
                 OnValueChanged?.Invoke(value);
             }
 
@@ -90,7 +102,8 @@ namespace Variables
     [System.Serializable]
     public class Variable : ScriptableObject
     {
-
+        [SerializeField]
+        public bool LogOutput;
     }
 
 

@@ -1,6 +1,16 @@
 {
     "name": "jreason.ScriptableVariables",
-    "references": [],
+    "rootNamespace": "",
+    "references": [
+        "GUID:e013377c7b7ef4b408ee0bcbc9699048"
+    ],
     "includePlatforms": [],
-    "excludePlatforms": []
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

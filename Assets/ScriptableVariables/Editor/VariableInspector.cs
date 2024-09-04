@@ -5,7 +5,8 @@ using System.Linq;
 using System.Collections;
 using System.Reflection;
 using Inspector = UnityEditor.Editor;
-
+using Codice.Client.BaseCommands.BranchExplorer;
+using Variables.Diagnostics.Editor;
 
 namespace Variables.Editor
 {
@@ -24,7 +25,21 @@ namespace Variables.Editor
 
         //Name of Variable Type
         private string m_TypeName;
+
+        //scroll position in stacktracebox
+        private Vector2 m_stackTraceScroll;
+
+        private LogEditor m_logEditor;
+
         #endregion
+
+
+        #region Getters
+
+        protected new Variable target => base.target as Variable;
+
+        #endregion
+
 
         #region Unity Functions
         public void OnEnable()
@@ -32,6 +47,8 @@ namespace Variables.Editor
             //set up values
             m_value = serializedObject.FindProperty("m_value");
             m_TypeName = VariableMenuUtility.CachedAttributes[target.GetType()].GetNameOnly();
+
+            m_logEditor = new LogEditor(target);
         }
 
         public override void OnInspectorGUI()
@@ -44,7 +61,7 @@ namespace Variables.Editor
                 m_value.isExpanded = true; //force property to be expanded (e.g. Quaternions)
 
                 EditorGUI.BeginChangeCheck();
-           
+
                 //display and apply property
                 EditorGUILayout.PropertyField(m_value, new GUIContent(m_value.propertyType.ToString()), true);
 
@@ -54,11 +71,15 @@ namespace Variables.Editor
                 if (EditorGUI.EndChangeCheck())
                 {
                     EditorVariableUtility.InvokeVariableEvent(target);
-                } 
+                }
             }
 
             EditorGUILayout.Space();
-            
+
+            m_logEditor?.OnGUI();
+
+        
+
 
         }
         #endregion
@@ -87,7 +108,9 @@ namespace Variables.Editor
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
         }
 
-      
+
+ 
+
         #endregion GUI Functions
 
         #region Helper Functions
@@ -119,7 +142,7 @@ namespace Variables.Editor
                 Selection.activeObject = newAsset;
             }
 
-        } 
+        }
         #endregion
 
     }
