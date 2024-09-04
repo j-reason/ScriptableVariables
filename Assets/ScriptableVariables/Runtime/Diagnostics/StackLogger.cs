@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -19,7 +20,7 @@ namespace Variables.Diagnostics
 		static readonly Type[] TYPES_TO_IGNORE = { typeof(StackLogger), typeof(Variable) };
 
 
-		public static void LogUsage(Variable variable)
+		public static void LogUsage(Variable variable, FunctionType mode)
 		{
 		
 			if (!s_AllLogs.TryGetValue(variable, out List<StackTrace> logs))
@@ -29,7 +30,15 @@ namespace Variables.Diagnostics
 			}
 
 			var st = new StackTrace(3,true);
-			
+
+			if (mode == FunctionType.Get)
+			{
+				Debug.Log($"GET: {variable}");
+			}
+			else
+			{
+                Debug.Log($"SET: {variable}");
+            }
 			//Debug.Log(PrintStackTrace(st));
 			logs.Add(st);
 		}

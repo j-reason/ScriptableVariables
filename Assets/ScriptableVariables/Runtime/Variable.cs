@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace Variables
 {
@@ -60,18 +61,17 @@ namespace Variables
         /// Set a new value for the variable
         /// </summary>
         /// <param name="variable"></param>
-        public void SetValue(T value)
+        public void SetValue(T value, bool dontLog = false)
         {
             // TODO: Make the comparer setable
-            if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(), value))
+            if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(dontLog: true), value))
             {
                 m_value = value;
 
 #if UNITY_EDITOR
-                if (LogOutput)
+                if (LogOutput && !dontLog)
                 {
-                    Variables.Diagnostics.StackLogger.LogUsage(this);
-                    Debug.Log($"Set {name} to {value}");
+                    Variables.Diagnostics.StackLogger.LogUsage(this, Diagnostics.StackLogger.FunctionType.Set);
                 }
 #endif
 
@@ -85,9 +85,21 @@ namespace Variables
         /// Get current Value of the Variable
         /// </summary>
         /// <returns>Value of the variable</returns>
-        public T GetValue()
+        public T GetValue(bool dontLog = false)
         {
+#if UNITY_EDITOR
+            if (LogOutput && !dontLog)
+            {
+                Variables.Diagnostics.StackLogger.LogUsage(this, Diagnostics.StackLogger.FunctionType.Get);
+            }
+#endif
+
             return m_value;
+        }
+
+        public override object GetVariableObject(bool dontLog = false)
+        {
+            return GetValue(dontLog);
         }
 
 
@@ -104,6 +116,14 @@ namespace Variables
     {
         [SerializeField]
         public bool LogOutput;
+
+
+        public virtual object GetVariableObject(bool dontLog = false) { return null; }
+
+        public override string ToString()
+        {
+            return $"[{name}]:{GetVariableObject(dontLog: true)}";
+        }
     }
 
 
