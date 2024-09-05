@@ -64,7 +64,7 @@ namespace Variables
         public void SetValue(T value, bool dontLog = false)
         {
             // TODO: Make the comparer setable
-            if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(dontLog: true), value))
+            if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(skiplogging: true), value))
             {
                 m_value = value;
 
@@ -85,10 +85,10 @@ namespace Variables
         /// Get current Value of the Variable
         /// </summary>
         /// <returns>Value of the variable</returns>
-        public T GetValue(bool dontLog = false)
+        public T GetValue(bool skiplogging = false)
         {
 #if UNITY_EDITOR
-            if (LogOutput && !dontLog)
+            if (LogOutput && !skiplogging)
             {
                 Variables.Diagnostics.StackLogger.LogUsage(this, Diagnostics.StackLogger.FunctionType.Get);
             }
@@ -97,9 +97,9 @@ namespace Variables
             return m_value;
         }
 
-        public override object GetVariableObject(bool dontLog = false)
+        public override object GetVariableObject(bool skipLogging = false)
         {
-            return GetValue(dontLog);
+            return GetValue(skipLogging);
         }
 
 
@@ -117,12 +117,15 @@ namespace Variables
         [SerializeField]
         public bool LogOutput;
 
+        [SerializeField]
+        public bool ResetAfterPlay;
 
-        public virtual object GetVariableObject(bool dontLog = false) { return null; }
+
+        public virtual object GetVariableObject(bool skipLogging = false) { return null; }
 
         public override string ToString()
         {
-            return $"[{name}]:{GetVariableObject(dontLog: true)}";
+            return $"[{name}]:{GetVariableObject(skipLogging: true)}";
         }
     }
 

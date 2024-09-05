@@ -8,7 +8,7 @@ namespace Variables
     /// </summary>
     /// <typeparam name="T">Type we want the Variable to be</typeparam>
     [System.Serializable]
-    public class Reference<T>
+    public class Reference<T> : Reference
     {
 
         #region Serialised Fields
@@ -127,5 +127,8 @@ namespace Variables
 
         public static implicit operator T(Reference<T> value) => value.Value;
     }
+
+
+    public class Reference { }
 
 }

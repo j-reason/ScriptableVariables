@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
@@ -17,18 +19,19 @@ namespace Variables.Diagnostics.Editor
 
         private Variable m_target;
         private Vector2 m_scrollPosition;
-        private StackTrace m_expandedLog;
+        private StackLogger.LogData m_expandedLog;
+        private bool m_isCollapsed = false;
 
         public LogEditor(Variable target)
         {
             m_target = target;
 
-            
+
         }
 
         public void OnGUI()
         {
-            
+
 
             if (s_linkLabel == null)
                 SetUpStyles();
@@ -43,16 +46,30 @@ namespace Variables.Diagnostics.Editor
             if (!m_target.LogOutput)
                 return;
 
+            TopBar();
+
             //Create Scroll that lists will be drawn in
             m_scrollPosition = GUILayout.BeginScrollView(m_scrollPosition, EditorStyles.helpBox, GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight * 10));
 
+
             //Get all logs
-            var Logs = Diagnostics.StackLogger.GetUsage(m_target);
-            if (Logs.Count == 0)
+            List<StackLogger.LogData> logs;
+            if (!m_isCollapsed)
+                logs = Diagnostics.StackLogger.GetUsage(m_target);
+            else
+                logs = Diagnostics.StackLogger.GetCollapsedUsage(m_target);
+
+
+            if (logs.Count == 0)
                 GUILayout.FlexibleSpace();
 
-            bool isOdd = false;
-            foreach (var log in Logs)
+            //Loop through all Logs
+            bool isOdd = false; //used to alternate line colours
+
+
+
+
+            foreach (var log in logs)
             {
                 var isExpanded = log == m_expandedLog;
                 isOdd = !isOdd;
@@ -68,41 +85,75 @@ namespace Variables.Diagnostics.Editor
         }
 
 
-        private bool DrawStackFrame(StackTrace trace, bool isOdd, bool isExpanded)
+        private void TopBar()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(2);
+            if (GUILayout.Button("Clear", EditorStyles.miniButtonMid, GUILayout.Width(50.0f)))
+            {
+                Diagnostics.StackLogger.ClearUsage(m_target);
+            }
+            m_isCollapsed = GUILayout.Toggle(m_isCollapsed, "Collapse", EditorStyles.miniButtonMid, GUILayout.Width(75.0f));
+
+            GUILayout.Box(GUIContent.none, EditorStyles.miniButtonMid);
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(-EditorGUIUtility.singleLineHeight * 0.18f);
+
+        }
+
+
+        private bool DrawStackFrame(StackLogger.LogData data, bool isOdd, bool isExpanded)
         {
 
-            var frame = trace.GetFrame(1);
-            var frames = trace.GetFrames();
+            IEnumerable<StackFrame> frames = data.StackTrace.GetFilteredFrames();
 
-            if (frame == null) return isExpanded;
 
-            string reltaivePath = GetPathRelative(frame.GetFileName(), Application.dataPath);
+
+
 
             GUIStyle style = isOdd ? EditorStyles.label : s_darkBackground;
             var rect = EditorGUILayout.BeginVertical(style);
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button(GUIContent.none, EditorStyles.foldout, GUILayout.Width(10)))
-                isExpanded = !isExpanded;
+            if (frames.Count() > 1)
+                if (GUILayout.Button(GUIContent.none, EditorStyles.foldout, GUILayout.Width(10)))
+                    isExpanded = !isExpanded;
 
             GUILayout.BeginVertical();
 
-            if (isExpanded)
-                DrawFrames(frames);
-            else
-                DrawFrames(frame);
+
+            if (!isExpanded)
+                frames = new StackFrame[] { frames.First() };
+
+            if (frames == null || frames.All(p => p is null)) return isExpanded;
+
+            DrawFrames(frames);
+
 
 
             GUILayout.EndVertical();
+
+            if (data.CollapsedUsage > 1)
+            {
+                GUILayout.FlexibleSpace();
+                //GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                GUILayout.BeginVertical();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
+                GUILayout.Label(data.CollapsedUsage.ToString(), EditorStyles.helpBox);
+                GUILayout.EndVertical();
+                //GUILayout.EndHorizontal();
+            }
+
             GUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
 
             return isExpanded;
         }
 
-        private void DrawFrames(params StackFrame[] frames)
+        private void DrawFrames(IEnumerable<StackFrame> frames)
         {
-
             foreach (var frame in frames)
             {
                 //if (typeof(Variable).IsAssignableFrom(frame.GetMethod().DeclaringType))
@@ -118,12 +169,17 @@ namespace Variables.Diagnostics.Editor
                 }
 
                 GUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
+
             }
         }
 
 
         private string GetPathRelative(string path, string relativeTo)
         {
+            if (string.IsNullOrEmpty(relativeTo) || string.IsNullOrEmpty(path))
+                return path;
+
+
             return new Uri(relativeTo).MakeRelativeUri(new Uri(path)).OriginalString;
         }
 
@@ -141,7 +197,7 @@ namespace Variables.Diagnostics.Editor
             var consoleBackground = new Texture2D(1, 1, TextureFormat.RGBAFloat, false);
             consoleBackground.SetPixel(0, 0, new Color(0.75f, 0.75f, 0.75f, 1f));
             consoleBackground.Apply();
-            s_darkBackground.normal.background= consoleBackground;
+            s_darkBackground.normal.background = consoleBackground;
         }
 
     }
