@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.Plastic.Newtonsoft.Json.Linq;
+using Variables.Diagnostics;
 
 namespace Variables
 {
@@ -61,7 +62,7 @@ namespace Variables
         /// Set a new value for the variable
         /// </summary>
         /// <param name="variable"></param>
-        public void SetValue(T value, bool dontLog = false)
+        public void SetValue(T value, bool skipLogging = false)
         {
             // TODO: Make the comparer setable
             if (allowValueRepeating || !EqualityComparer<T>.Default.Equals(GetValue(skiplogging: true), value))
@@ -69,7 +70,7 @@ namespace Variables
                 m_value = value;
 
 #if UNITY_EDITOR
-                if (LogOutput && !dontLog)
+                if (StackLogger.isVariableLogged(this) && !skipLogging)
                 {
                     Variables.Diagnostics.StackLogger.LogUsage(this, Diagnostics.StackLogger.FunctionType.Set);
                 }
@@ -88,7 +89,7 @@ namespace Variables
         public T GetValue(bool skiplogging = false)
         {
 #if UNITY_EDITOR
-            if (LogOutput && !skiplogging)
+            if (StackLogger.isVariableLogged(this) && !skiplogging)
             {
                 Variables.Diagnostics.StackLogger.LogUsage(this, Diagnostics.StackLogger.FunctionType.Get);
             }
