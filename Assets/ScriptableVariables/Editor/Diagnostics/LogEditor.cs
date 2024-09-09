@@ -17,13 +17,14 @@ namespace Variables.Diagnostics.Editor
         private static GUIStyle s_linkLabel;
         private static GUIStyle s_darkBackground;
         private static GUIStyle s_richLabel;
-        private static GUIStyle s_smallFoldout;
+        private static GUIStyle s_miniTextField;
 
 
         private Variable m_target;
         private Vector2 m_scrollPosition;
         private StackLogger.LogData m_expandedLog;
         private bool m_isCollapsed = false;
+        private string m_filter;
 
         public LogEditor(Variable target)
         {
@@ -99,6 +100,14 @@ namespace Variables.Diagnostics.Editor
             m_isCollapsed = GUILayout.Toggle(m_isCollapsed, "Collapse", EditorStyles.miniButtonMid, GUILayout.Width(75.0f));
 
             GUILayout.Box(GUIContent.none, EditorStyles.miniButtonMid);
+            var rect = GUILayoutUtility.GetLastRect();
+            rect.width = Mathf.Min(rect.width - 5, 200);
+            rect.height *= 0.8f;
+            rect.y += EditorGUIUtility.singleLineHeight * (1-0.75f)/2.0f;
+            rect.x += 5;
+
+            m_filter = EditorGUI.TextField(rect, m_filter, s_miniTextField);
+
 
             GUILayout.EndHorizontal();
 
@@ -116,7 +125,7 @@ namespace Variables.Diagnostics.Editor
             GUILayout.BeginHorizontal();
 
             //DrawFrames(frames);
-            isExpanded = DrawLog(data, isExpanded);
+            isExpanded = DrawLog(data, isExpanded, m_filter);
 
             if (data.Usage > 1)
             {
@@ -135,12 +144,18 @@ namespace Variables.Diagnostics.Editor
             return isExpanded;
         }
 
-        private bool DrawLog(StackLogger.LogData data, bool isExpanded)
+        private bool DrawLog(StackLogger.LogData data, bool isExpanded, string filter)
         {
+            
+
 
             IEnumerable<StackFrame> frames = data.StackTrace.GetFilteredFrames();
             StackFrame firstFrame = frames.FirstOrDefault();
             IEnumerable<StackFrame> otherFrames = frames.Skip(1);
+
+            //return if filter not met
+            if (!string.IsNullOrWhiteSpace(filter) && !frames.Any(p => p.GetMethod().Name.Contains(filter)))
+                return false;
 
             //GUILayout.BeginHorizontal();
             string mode = data.FunctionType == StackLogger.FunctionType.Get ? "GET" : "SET";
@@ -165,6 +180,8 @@ namespace Variables.Diagnostics.Editor
                 GUILayout.Space(0);
             }
 
+            GUILayout.BeginVertical();
+
             DrawFrame(firstFrame);
 
 
@@ -173,13 +190,14 @@ namespace Variables.Diagnostics.Editor
 
             if (isExpanded)
             {
-                GUILayout.BeginVertical();
+                
                 foreach (var frame in otherFrames)
                 {
                     DrawFrame(frame);
                 }
-                GUILayout.EndVertical();
+                
             }
+            GUILayout.EndVertical();
 
 
 
@@ -193,40 +211,16 @@ namespace Variables.Diagnostics.Editor
 
             string methodName = $"{frame.GetMethod().DeclaringType.FullName}:{frame.GetMethod().Name}()";
             string line = $"{relativePath}:{frame.GetFileLineNumber()}";
-            //GUILayout.BeginHorizontal();
+
+
             GUILayout.Space(s_richLabel.fontSize * 0.3f);
-            if (GUILayout.Button($"<b>{methodName}</b> at <size={s_richLabel.fontSize * 0.9f}><i><color=blue>{line}</color></i></size>", s_richLabel, GUILayout.Height(EditorGUIUtility.singleLineHeight * 0.75f)))
+            if (GUILayout.Button($"<b>{methodName}</b> <size={s_richLabel.fontSize * 0.9f}><i><color=blue>{line}</color></i></size>", s_richLabel, GUILayout.Height(EditorGUIUtility.singleLineHeight * 0.75f)))
             {
                 var file = AssetDatabase.LoadAssetAtPath<TextAsset>(relativePath);
                 AssetDatabase.OpenAsset(file, frame.GetFileLineNumber(), frame.GetFileColumnNumber());
 
             }
-            //GUILayout.EndHorizontal();
-        }
 
-
-
-        private void DrawFrames(IEnumerable<StackFrame> frames)
-        {
-            foreach (var frame in frames)
-            {
-                //if (typeof(Variable).IsAssignableFrom(frame.GetMethod().DeclaringType))
-
-                string relativePath = GetPathRelative(frame.GetFileName(), Application.dataPath);
-
-                string methodName = $"{frame.GetMethod().DeclaringType.FullName}:{frame.GetMethod().Name}";
-                string line = $"{relativePath}:{frame.GetFileLineNumber()}";
-
-                if (GUILayout.Button($"{methodName} at <i><color=blue>{line}</color></i>", s_richLabel, GUILayout.Height(EditorGUIUtility.singleLineHeight * 0.75f)))
-                {
-                    var file = AssetDatabase.LoadAssetAtPath<TextAsset>(relativePath);
-                    AssetDatabase.OpenAsset(file, frame.GetFileLineNumber(), frame.GetFileColumnNumber());
-
-                }
-
-                GUILayout.Space(EditorGUIUtility.singleLineHeight * 0.5f);
-
-            }
         }
 
 
@@ -256,19 +250,28 @@ namespace Variables.Diagnostics.Editor
         {
             s_linkLabel = new GUIStyle(EditorStyles.linkLabel);
             s_linkLabel.fontSize = (int)(EditorStyles.linkLabel.fontSize * 0.95f);
+            s_linkLabel.normal.textColor *= EditorGUIUtility.isProSkin ? 1.1f : 1.0f; 
 
             s_darkBackground = new GUIStyle(EditorStyles.label);
+
+            Color oddColor = EditorGUIUtility.isProSkin ? Color.white * 0.2f : Color.white * 0.75f;
+            oddColor.a = 1;
+
             var consoleBackground = new Texture2D(1, 1, TextureFormat.RGBAFloat, false);
-            consoleBackground.SetPixel(0, 0, new Color(0.75f, 0.75f, 0.75f, 1f));
+            consoleBackground.SetPixel(0, 0, oddColor);
             consoleBackground.Apply();
             s_darkBackground.normal.background = consoleBackground;
+            
+
+
 
             s_richLabel = new GUIStyle(EditorStyles.label);
             s_richLabel.richText = true;
 
-            s_smallFoldout = new GUIStyle(EditorStyles.foldout);
-            s_smallFoldout.fixedWidth = -5;
-            s_smallFoldout.stretchWidth = false;
+            s_miniTextField = new GUIStyle(EditorStyles.toolbarSearchField);
+            s_miniTextField.fixedHeight = EditorGUIUtility.singleLineHeight * 0.75f;
+
+
         }
 
     }
