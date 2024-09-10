@@ -22,6 +22,7 @@ namespace Variables.Editor
         #region Private Variables
         //References to serialized properties
         private SerializedProperty m_value;
+        private SerializedProperty m_resetProperties;
 
         //Name of Variable Type
         private string m_TypeName;
@@ -46,6 +47,7 @@ namespace Variables.Editor
         {
             //set up values
             m_value = serializedObject.FindProperty("m_value");
+            m_resetProperties = serializedObject.FindProperty(nameof(Variable.ResetOption));
             m_TypeName = VariableMenuUtility.CachedAttributes[target.GetType()].GetNameOnly();
 
             m_logEditor = new LogEditor(target);
@@ -75,7 +77,9 @@ namespace Variables.Editor
             }
 
             EditorGUILayout.Space();
+            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
 
+            ResetGUI();
             m_logEditor?.OnGUI();
 
         
@@ -106,6 +110,12 @@ namespace Variables.Editor
             //End horizontal + draw line underneath
             GUILayout.EndHorizontal();//E
             EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+        }
+
+        private void ResetGUI()
+        {
+            GUILayout.Label("Settings", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(m_resetProperties);
         }
 
 

@@ -81,11 +81,24 @@ namespace Variables.Editor
             foreach (var entry in m_storedCopies)
             {
 
-                //Uses CopySerialized so references aren't broken
-                EditorUtility.CopySerialized(entry.Value, entry.Key);
 
+                switch (entry.Key.ResetOption)
+                {
+                    case Variable.ResetBehaviour.NeverReset: break;
+                    case Variable.ResetBehaviour.SkipResetThisTime:
+                        entry.Key.ResetOption = Variable.ResetBehaviour.AlwaysReset;
+                        break;
 
-                //#TODO set it up so that users can choose not to reset some Variables
+                    case Variable.ResetBehaviour.ResetThisTime:
+                        EditorUtility.CopySerialized(entry.Value, entry.Key); //Uses CopySerialized so references aren't broken
+                        entry.Key.ResetOption = Variable.ResetBehaviour.NeverReset;
+                        break;
+                    case Variable.ResetBehaviour.AlwaysReset:
+                        EditorUtility.CopySerialized(entry.Value, entry.Key); //Uses CopySerialized so references aren't broken
+                        break;
+                }
+
+                
             }
 
             //clear list since all copies have been re-applied

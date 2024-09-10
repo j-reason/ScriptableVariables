@@ -115,11 +115,17 @@ namespace Variables
     [System.Serializable]
     public class Variable : ScriptableObject
     {
-        [SerializeField]
-        public bool LogOutput;
+        
+        public enum ResetBehaviour
+        {
+            NeverReset,
+            SkipResetThisTime,
+            ResetThisTime,
+            AlwaysReset
+        }
 
-        [SerializeField]
-        public bool ResetAfterPlay;
+
+        public ResetBehaviour ResetOption = ResetBehaviour.AlwaysReset;
 
 
         public virtual object GetVariableObject(bool skipLogging = false) { return null; }

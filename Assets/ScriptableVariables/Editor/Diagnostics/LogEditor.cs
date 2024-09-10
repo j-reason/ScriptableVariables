@@ -42,7 +42,7 @@ namespace Variables.Diagnostics.Editor
 
             //Draw line + title
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+            
             GUILayout.Label("Diagnostics", EditorStyles.boldLabel);
 
             DrawBoolToggle();
