@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Unity.Plastic.Newtonsoft.Json.Linq;
+
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
+
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -188,6 +191,7 @@ namespace Variables.Diagnostics
 
         #region Assembly Reload Functions
 
+#if UNITY_EDITOR
 
         /// <summary>
         /// Called by Unity Editor when it first loads (and other times)
@@ -296,9 +300,11 @@ namespace Variables.Diagnostics
             for (int i = 0; i < loggedVariableCount; i++)
                 EditorPrefs.DeleteKey($"{EDITOR_PREFS_KEY}_{i}");
         }
+
+
+#endif
+
         #endregion Assembly Reload Functions
-
-
     }
 }
 

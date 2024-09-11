@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json.Linq;
 using Variables.Diagnostics;
 
 namespace Variables
