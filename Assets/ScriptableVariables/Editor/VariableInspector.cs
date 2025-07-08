@@ -5,7 +5,6 @@ using System.Linq;
 using System.Collections;
 using System.Reflection;
 using Inspector = UnityEditor.Editor;
-using Codice.Client.BaseCommands.BranchExplorer;
 using Variables.Diagnostics.Editor;
 
 namespace Variables.Editor
