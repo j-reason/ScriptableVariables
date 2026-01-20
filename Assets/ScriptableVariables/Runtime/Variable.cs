@@ -28,7 +28,7 @@ namespace Variables
         
 
         /// <summary>
-        /// Current value of the variable
+        /// Current value of the Variable changes 
         /// </summary>
         public virtual T Value
         {
@@ -44,9 +44,20 @@ namespace Variables
         }
 
         /// <summary>
-        /// Delegate for holding actions to be called when value changes
+        /// Called when the Value of variable changes and passes the new value as the parameter
         /// </summary>
+        /// <remarks>
+        /// Use OnChange if you don't want the new value
+        /// </remarks>
         public Action<T> OnValueChanged;
+
+        /// <summary>
+        /// Called when the Value of variable changes
+        /// </summary>
+        /// <remarks>
+        /// Use OnValueChanged if you need the new value
+        /// </remarks>
+        public Action OnChange;
 
         /// <summary>
         /// Set a new value for the variable

@@ -23,7 +23,8 @@ namespace Variables
 
         #endregion Serialised Fields
 
-        private Action<T> m_onLocalChange;
+        private Action<T> m_localOnChangeValue;
+        private Action m_localOnChange;
 
 
         #region Contructors
@@ -50,7 +51,7 @@ namespace Variables
                 if (m_useLocal)
                 {
                     m_localValue = value;
-                    m_onLocalChange?.Invoke(value);
+                    m_localOnChangeValue?.Invoke(value);
                 }
                 else
                     Variable.Value = value;
@@ -69,7 +70,7 @@ namespace Variables
                 if (!m_useLocal && Variable != null)
                     Variable.OnValueChanged += value;
 
-                m_onLocalChange += value;
+                m_localOnChangeValue += value;
 
             }
             remove
@@ -78,8 +79,27 @@ namespace Variables
                 if (!m_useLocal && Variable != null)
                     Variable.OnValueChanged -= value;
 
-                m_onLocalChange -= value;
+                m_localOnChangeValue -= value;
 
+            }
+        }
+
+
+        public event Action OnChange
+        {
+            add
+            {
+                if (!m_useLocal && Variable != null)
+                    Variable.OnChange += value;
+
+                m_localOnChange += value;
+            }
+            remove
+            {
+                if (!m_useLocal && Variable != null)
+                    Variable.OnChange -= value;
+
+                m_localOnChange -= value;
             }
         }
 
@@ -93,16 +113,28 @@ namespace Variables
         public void SetReference(Variable<T> variable)
         {
             //if this reference isn't set to local and there are events remove them from the variable reference
-            if (!m_useLocal && Variable != null && m_onLocalChange != null)
-                Variable.OnValueChanged -= m_onLocalChange;
+            if (!m_useLocal && Variable != null )
+            {
+                if (m_localOnChangeValue != null)
+                Variable.OnValueChanged -= m_localOnChangeValue;
+
+                if (m_localOnChange != null)
+                    Variable.OnChange -= m_localOnChange;
+            }
 
             //Set the variable and if check if it's null
             Variable = variable;
             m_useLocal = (variable == null);
 
             //If the variable isn't null add all of the event listeners to it's event
-            if (!m_useLocal && m_onLocalChange != null)
-                Variable.OnValueChanged += m_onLocalChange;
+            if (!m_useLocal)
+            {
+                if (m_localOnChangeValue != null)
+                    Variable.OnValueChanged += m_localOnChangeValue;
+
+                if (m_localOnChangeValue != null)
+                    Variable.OnChange += m_localOnChange;
+            }
         }
 
         /// <summary>
@@ -126,6 +158,11 @@ namespace Variables
 
 
         public static implicit operator T(Reference<T> value) => value.Value;
+
+        #region Private Functions
+
+        #endregion Private Functions
+
     }
 
 
