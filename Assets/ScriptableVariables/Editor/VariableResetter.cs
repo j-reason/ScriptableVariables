@@ -13,27 +13,56 @@ namespace Variables.Editor
     /// <summary>
     /// Class to reset Variables when entering and exiting playmode in the Editor so they behave like monobehaviours
     /// </summary>
-    public class VariableResetter
+    /// <remarks>
+    /// Variable Resetter is a ScriptableObject so that it can survive assembly reloading.
+    /// If it was purely static it would loose it's data whenever a script it modified.
+    /// </remarks>
+    public class VariableResetter : ScriptableObject, ISerializationCallbackReceiver
     {
+
+        //used to store a session state to determine if this scriptable object has already been created.
+        //only one is nessesary for the lifetime of the Editor session
+        const string SESSION_STATE_KEY = "k_variableResset.hasInitialised";
+
 
         //Dictionary to store copies of variables
         //key is a reference to the asset
         //value is a copy which won't change
-        private static Dictionary<Variable, Variable> m_storedCopies = new Dictionary<Variable, Variable>();
+        private Dictionary<Variable, Variable> m_storedCopies = new Dictionary<Variable, Variable>(); //ISerializationCallbackReceiver is used to serialize and rebuild on serialization
+
+
+
+
 
 
         [InitializeOnLoadMethod]//Makes unity call this when the editor starts
         private static void RegisterResets()
         {
-            //listen for playmode changes
-            EditorApplication.playModeStateChanged += OnEditorPlayModeChange;
+
+            //Check to see if a variable resetter has already been created, there should only ever be one
+            if (SessionState.GetBool(SESSION_STATE_KEY, false)) //SessionStates states have a lifetime of while the unity editor is open
+            {
+                //Debug.Log($"{nameof(VariableResetter)} already exists");
+                return;
+            }
+
+            //set seesion state so another intance isn't created
+            SessionState.SetBool(SESSION_STATE_KEY, true);
+
+            //create an instance of the class 
+            var instance = ScriptableObject.CreateInstance<VariableResetter>();
+            instance.hideFlags = HideFlags.HideAndDontSave; //honestly I can't tell if this is nessessary, this is mixed opinions online.
+            EditorApplication.playModeStateChanged += instance.OnEditorPlayModeChange; //the scriptableobject needs to know when playmode changed to revert any changes to the variables
+
         }
+
+
 
         /// <summary>
         /// Callback for when unity changes playmode
         /// </summary>
         /// <param name="mode">new playmode</param>
-        private static void OnEditorPlayModeChange(PlayModeStateChange mode)
+        private void OnEditorPlayModeChange(PlayModeStateChange mode)
         {
 
             //Call backs have to happen after entering playmode and before exiting since m_storedCopies get reset when unity serializes everythings
@@ -47,7 +76,7 @@ namespace Variables.Editor
                 case PlayModeStateChange.ExitingPlayMode:
                     ResetCopies();
                     break;
-                case PlayModeStateChange.EnteredEditMode:              
+                case PlayModeStateChange.EnteredEditMode:
                     break;
             }
         }
@@ -55,7 +84,7 @@ namespace Variables.Editor
         /// <summary>
         /// Finds all Variables and creates a copy of them
         /// </summary>
-        private static void CreateCopies()
+        private void CreateCopies()
         {
             //Should be empty but good to call just incase
             ClearCopies();
@@ -67,14 +96,12 @@ namespace Variables.Editor
                 copy.name = variable.name; //this remove (Clone) from the name
                 m_storedCopies.Add(variable, copy);
             }
-
-
         }
 
         /// <summary>
         /// Applies the original stored data back to Variable Assets
         /// </summary>
-        private static void ResetCopies()
+        private void ResetCopies()
         {
 
             //loops through all Copies created
@@ -98,7 +125,7 @@ namespace Variables.Editor
                         break;
                 }
 
-                
+
             }
 
             //clear list since all copies have been re-applied
@@ -108,7 +135,7 @@ namespace Variables.Editor
         /// <summary>
         /// Clears m_storedCopies and destroys all copies of variables
         /// </summary>
-        private static void ClearCopies()
+        private void ClearCopies()
         {
 
             //Destroy copies of variables
@@ -139,5 +166,45 @@ namespace Variables.Editor
             return retVal;
 
         }
-    } 
+
+
+        #region ISerialization Implementation
+
+        //Arrays used to store 'm_storedCopies' during serialization
+        private Variable[] serializedKeys, serializedValues;
+
+        /// <summary>
+        /// Called by Unity before running Serialization
+        /// </summary>
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+
+            //copy Dictionary into arrays
+            serializedKeys = m_storedCopies.Keys.ToArray();
+            serializedValues = m_storedCopies.Values.ToArray();
+        }
+
+        /// <summary>
+        /// Called by Unity after deserializing
+        /// </summary>
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+
+            //Remake dictionary from arrays
+            m_storedCopies = new Dictionary<Variable, Variable>();
+
+            //make sure the arrays are correct, if they aren't something has happened on Unity's side of things
+            if (serializedKeys == null || serializedValues == null || serializedKeys.Length != serializedValues.Length)
+                Debug.LogWarning("Variables not serialized correctly. Unable to Restore"); //if this gets called something bad has happened
+
+            else
+                //iterate through arrays and rebuild dictionary
+                for (int i = 0; i < serializedKeys.Length; i++)
+                    m_storedCopies.Add(serializedKeys[i], serializedValues[i]);
+
+            //need to re-register to event after serialization
+            EditorApplication.playModeStateChanged += OnEditorPlayModeChange;
+        } 
+        #endregion
+    }
 }
