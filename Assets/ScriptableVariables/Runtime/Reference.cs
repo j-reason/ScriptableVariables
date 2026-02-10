@@ -51,6 +51,7 @@ namespace Variables
                 if (m_useLocal)
                 {
                     m_localValue = value;
+                    m_localOnChange?.Invoke();
                     m_localOnChangeValue?.Invoke(value);
                 }
                 else

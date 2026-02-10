@@ -86,8 +86,9 @@ namespace Variables
                 }
 #endif
 
-
+                OnChange?.Invoke();
                 OnValueChanged?.Invoke(value);
+                
             }
 
         }
