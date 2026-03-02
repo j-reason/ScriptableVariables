@@ -114,6 +114,15 @@ namespace Variables
             return GetValue(skipLogging);
         }
 
+        public override void SetVariableObject(object value, bool skipLogging = false)
+        {
+            if (!(value is T))
+                throw new ArgumentException($"{value.GetType()} is not of Type({typeof(T)})", "value");
+
+            SetValue((T)value, skipLogging);
+        }
+
+
 
         /// <summary>
         /// Implicit cast from Variable<T> type to T
@@ -140,6 +149,8 @@ namespace Variables
 
 
         public virtual object GetVariableObject(bool skipLogging = false) { return null; }
+
+        public virtual void SetVariableObject(object value, bool skipLogging = false) {  }
 
         public override string ToString()
         {
